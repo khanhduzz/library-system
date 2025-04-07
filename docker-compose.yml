@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: library-system
+    ports:
+      - "1433:1433"
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_AGENT_ENABLED=true
+      - MSSQL_PID=Developer
+      - SA_PASSWORD=YourStrongPassword123!
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+      - ./secrets:/secrets:ro
+
+volumes:
+  sqlserver_data:
