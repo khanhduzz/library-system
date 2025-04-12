@@ -16,5 +16,6 @@ namespace LibrarySystem.Data
 
         public DbSet<LibrarySystem.Models.Book> Book { get; set; } = default!;
         public DbSet<LibrarySystem.Models.Author> Author { get; set; } = default!;
+        public DbSet<LibrarySystem.Models.User> User { get; set; } = default!;
     }
 }
