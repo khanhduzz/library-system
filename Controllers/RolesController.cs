@@ -7,8 +7,9 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using LibrarySystem.Data;
 using LibrarySystem.Models;
+using LibrarySystem.Enums;
 
-namespace LibrarySystem
+namespace LibrarySystem.Controllers
 {
     public class RolesController : Controller
     {
@@ -46,6 +47,13 @@ namespace LibrarySystem
         // GET: Roles/Create
         public IActionResult Create()
         {
+            var roleOptions = Enum.GetValues(typeof(UserRole)).Cast<UserRole>()
+                .Select(r => new SelectListItem
+                    {
+                        Value = ((int)r).ToString(),
+                        Text = r.ToString()
+                    }).ToList();
+            ViewBag.RoleOptions = roleOptions;
             return View();
         }
 

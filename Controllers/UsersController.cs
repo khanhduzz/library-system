@@ -46,6 +46,7 @@ namespace LibrarySystem.Controllers
         // GET: Users/Create
         public IActionResult Create()
         {
+            ViewBag.Roles = _context.Role.ToList();
             return View();
         }
 
@@ -54,14 +55,23 @@ namespace LibrarySystem.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Email,Password,UserName")] User user)
+        public async Task<IActionResult> Create([Bind("Id,Name,Email,Password,UserName")] User user, List<int> selectedRoles)
         {
             if (ModelState.IsValid)
             {
+                foreach (var roleId in selectedRoles)
+                {
+                    var role = await _context.Role.FindAsync(roleId);
+                    if (role != null)
+                    {
+                        user.Roles.Add(role);
+                    }
+                }
                 _context.Add(user);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+            ViewBag.Roles = new MultiSelectList(_context.Role.ToList(), "Id", "UserRole", selectedRoles);
             return View(user);
         }
 
