@@ -1,9 +1,11 @@
 using System.Diagnostics;
 using LibrarySystem.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LibrarySystem.Controllers
 {
+    [Authorize]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -23,10 +25,34 @@ namespace LibrarySystem.Controllers
             return View();
         }
 
+        [AllowAnonymous]
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
+        [Route("/Home/Error/{statusCode}")]
+        public IActionResult Error(int statusCode)
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            var viewModel = new ErrorViewModel
+            {
+                StatusCode = statusCode
+            };
+
+            switch (statusCode)
+            {
+                case 403:
+                    viewModel.Message = "You are not allowed.";
+                    break;
+                case 404:
+                    viewModel.Message = "Sorry, the page you are looking for could not be found.";
+                    break;
+                case 500:
+                    viewModel.Message = "Oops! Something went wrong on our end.";
+                    break;
+                default:
+                    viewModel.Message = "An unexpected error occurred.";
+                    break;
+            }
+
+            return View(viewModel);
         }
+
     }
 }

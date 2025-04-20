@@ -1,0 +1,22 @@
+﻿@model LibrarySystem.Models.ErrorViewModel
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Error @Model.StatusCode</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+</head>
+<body>
+    <div class="container">
+        <div class="text-center">
+            <p class="display-6">Error @Model.StatusCode</p>
+            @* <p>@Model.Message</p> *@
+            <h1 class="text-danger">@Model.Message</h1>
+            <p class="lead">You don't have access to this resource or something unexpected happened.</p>
+            <a href="@Url.Action("Index", "Home")" class="btn btn-primary">Go Back to Home</a>
+        </div>
+    </div>
+</body>
+</html>
