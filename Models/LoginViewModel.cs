@@ -5,8 +5,8 @@ namespace LibrarySystem.Models
     public class LoginViewModel
     {
         [Required]
-        public required string Username { get; set; }
+        public string Username { get; set; }
         [Required]
-        public required string Password { get; set; }
+        public string Password { get; set; }
     }
 }
