@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace LibrarySystem.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize]
     public class RolesController : Controller
     {
         private readonly LibrarySystemContext _context;
@@ -47,14 +47,20 @@ namespace LibrarySystem.Controllers
         }
 
         // GET: Roles/Create
-        public IActionResult Create()
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Create()
         {
-            var roleOptions = Enum.GetValues(typeof(UserRole)).Cast<UserRole>()
+            var existingRoles = await _context.Role.Select(r => r.UserRole).ToListAsync();
+
+            var roleOptions = Enum.GetValues(typeof(UserRole))
+                .Cast<UserRole>()
+                .Where(r => !existingRoles.Contains(r)) // remove already created roles
                 .Select(r => new SelectListItem
-                    {
-                        Value = ((int)r).ToString(),
-                        Text = r.ToString()
-                    }).ToList();
+                {
+                    Value = ((int)r).ToString(),
+                    Text = r.ToString()
+                }).ToList();
+
             ViewBag.RoleOptions = roleOptions;
             return View();
         }
@@ -64,18 +70,46 @@ namespace LibrarySystem.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create([Bind("Id,UserRole")] Role role)
         {
             if (ModelState.IsValid)
             {
+                var exists = await _context.Role
+                    .AnyAsync(r => r.UserRole == role.UserRole);
+
+                if (exists)
+                {
+                    ModelState.AddModelError("", "This role already exists.");
+                    var roleOptions = Enum.GetValues(typeof(UserRole)).Cast<UserRole>()
+                        .Select(r => new SelectListItem
+                        {
+                            Value = ((int)r).ToString(),
+                            Text = r.ToString()
+                        }).ToList();
+                    ViewBag.RoleOptions = roleOptions;
+                    return View(role);
+                }
+
                 _context.Add(role);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+
+            // Repopulate dropdown on error
+            var options = Enum.GetValues(typeof(UserRole)).Cast<UserRole>()
+                .Select(r => new SelectListItem
+                {
+                    Value = ((int)r).ToString(),
+                    Text = r.ToString()
+                }).ToList();
+            ViewBag.RoleOptions = options;
+
             return View(role);
         }
 
         // GET: Roles/Edit/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -96,6 +130,7 @@ namespace LibrarySystem.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int id, [Bind("Id,UserRole")] Role role)
         {
             if (id != role.Id)
@@ -127,6 +162,7 @@ namespace LibrarySystem.Controllers
         }
 
         // GET: Roles/Delete/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -147,6 +183,7 @@ namespace LibrarySystem.Controllers
         // POST: Roles/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var role = await _context.Role.FindAsync(id);
