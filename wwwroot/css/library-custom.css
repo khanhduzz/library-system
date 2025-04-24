@@ -1,0 +1,85 @@
+﻿:root {
+    --bs-primary: #B327B7;
+    --bs-primary-rgb: 179, 39, 183;
+    --bs-primary-text: #fff;
+    --bs-secondary: #FEF4FF;
+    --bs-secondary-rgb: 254, 244, 255;
+    --bs-secondary-text: #000;
+    --bs-primary-hover: #c94acc; /* lighter shade for hover */
+    --bs-primary-border: #9f1aa3;
+    --bs-secondary-hover: #fcecff;
+    --bs-secondary-border: #f3dcfa;
+}
+
+/* Primary Button */
+.btn-primary {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary-border);
+    color: var(--bs-primary-text);
+}
+
+    .btn-primary:hover,
+    .btn-primary:focus,
+    .btn-primary:active {
+        background-color: var(--bs-primary-hover);
+        border-color: var(--bs-primary-border);
+        color: var(--bs-primary-text);
+    }
+
+/* Secondary Button */
+.btn-secondary {
+    background-color: var(--bs-secondary);
+    border-color: var(--bs-secondary-border);
+    color: var(--bs-secondary-text);
+}
+
+    .btn-secondary:hover,
+    .btn-secondary:focus,
+    .btn-secondary:active {
+        background-color: var(--bs-secondary-hover);
+        border-color: var(--bs-secondary-border);
+        color: var(--bs-secondary-text);
+    }
+
+/* Alerts */
+.alert-primary {
+    background-color: var(--bs-primary);
+    color: var(--bs-primary-text);
+    border-color: var(--bs-primary-border);
+}
+
+.alert-secondary {
+    background-color: var(--bs-secondary);
+    color: var(--bs-secondary-text);
+    border-color: var(--bs-secondary-border);
+}
+
+/* Links */
+a {
+    color: var(--bs-primary);
+}
+
+    a:hover {
+        color: var(--bs-primary-hover);
+/*        text-decoration: underline;*/
+    }
+
+/* Borders */
+.border-primary {
+    border-color: var(--bs-primary) !important;
+}
+
+.border-secondary {
+    border-color: var(--bs-secondary) !important;
+}
+
+/* Backgrounds */
+.bg-primary {
+    background-color: var(--bs-primary) !important;
+    color: var(--bs-primary-text);
+}
+
+.bg-secondary {
+    background-color: var(--bs-secondary) !important;
+    color: var(--bs-secondary-text);
+}

@@ -11,5 +11,12 @@ namespace LibrarySystem.Models
         public UserRole UserRole { get; set; }
 
         public ICollection<User> Users { get; set; } = new List<User>();
+        public static IEnumerable<Role> GetRoles()
+        {
+            // Assuming you're getting roles from a static source or a database
+            return Enum.GetValues(typeof(UserRole))
+                       .Cast<UserRole>()
+                       .Select(role => new Role { UserRole = role });
+        }
     }
 }
