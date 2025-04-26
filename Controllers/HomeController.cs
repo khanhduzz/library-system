@@ -1,22 +1,36 @@
 using System.Diagnostics;
 using LibrarySystem.Models;
+using LibrarySystem.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using LibrarySystem.Generic;
 
 namespace LibrarySystem.Controllers
 {
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly LibrarySystemContext _context;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, LibrarySystemContext context)
         {
             _logger = logger;
+            _context = context;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            var books = await _context.Book.Include(b => b.Author).ToListAsync();
+            var authors = await _context.Author.ToListAsync();
+
+            var viewModel = new HomeViewModel
+            {
+                Books = books,
+                Authors = authors
+            };
+
+            return View(viewModel);
         }
 
         [Authorize]
@@ -52,6 +66,5 @@ namespace LibrarySystem.Controllers
 
             return View(viewModel);
         }
-
     }
 }

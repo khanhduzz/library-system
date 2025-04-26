@@ -1,8 +1,42 @@
-﻿@{
+﻿@model LibrarySystem.Generic.HomeViewModel
+
+@{
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container mt-5">
+    <h1 class="mb-4">Welcome to Library System</h1>
+
+    <h2 class="text-primary mb-3">Books</h2>
+    <div class="row">
+        @foreach (var book in Model.Books)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 border-primary">
+                    <div class="card-body">
+                        <h5 class="card-title">@book.Title</h5>
+                        <p class="card-text">@book.Description</p>
+                        <p class="card-text">
+                            <small class="text-muted">Author: @book.Author?.Name</small>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <h2 class="text-primary mt-5 mb-3">Authors</h2>
+    <div class="row">
+        @foreach (var author in Model.Authors)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 border-secondary">
+                    <div class="card-body">
+                        <h5 class="card-title">@author.Name</h5>
+                        <p class="card-text">@author.Description</p>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
 </div>
