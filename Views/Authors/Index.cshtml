@@ -42,35 +42,6 @@
     </table>
 </div>
 
-<!-- Create Author Modal -->
-<div class="modal fade" id="createAuthorModal" tabindex="-1" aria-labelledby="createAuthorModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <form method="post">
-                <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title" id="createAuthorModalLabel">Create Author</h5>
-                    <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="form-group mb-3">
-                        <label for="authorName" class="control-label">Author Name</label>
-                        <input type="text" id="authorName" name="Name" class="form-control" placeholder="Enter author's full name" />
-                    </div>
-                    <div class="form-group mb-3">
-                        <label for="authorDescription" class="control-label">Description</label>
-                        <input type="text" id="authorDescription" name="Description" class="form-control" placeholder="Enter a short description or bio" />
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Create</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-
 <!-- Delete Confirmation Modal -->
 <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -78,7 +49,9 @@
             <form id="deleteForm" method="post">
                 <div class="modal-header bg-primary text-white">
                     <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
-                    <button type="button" class="btn-close text-white" data-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
                 <div class="modal-body">
                     Are you sure you want to delete the author "<span id="modalAuthorName"></span>"?
