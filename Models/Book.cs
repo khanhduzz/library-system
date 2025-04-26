@@ -13,5 +13,6 @@ namespace LibrarySystem.Models
         [Display(Name = "Author")]
         public int? AuthorId { get; set; }
         public Author? Author { get; set; }
+        public byte[]? Image { get; set; }
     }
 }
