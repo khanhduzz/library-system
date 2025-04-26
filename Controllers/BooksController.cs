@@ -84,7 +84,7 @@ namespace LibrarySystem.Controllers
             {
                 return NotFound();
             }
-            ViewData["AuthorId"] = new SelectList(_context.Set<Author>(), "Id", "Id", book.AuthorId);
+            ViewData["AuthorId"] = new SelectList(_context.Set<Author>(), "Id", "Name", book.AuthorId);
             return View(book);
         }
 
