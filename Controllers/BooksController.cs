@@ -105,7 +105,7 @@ namespace LibrarySystem.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Description,AuthorId")] Book book)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Description,AuthorId")] Book book, IFormFile? ImageFile)
         {
             if (id != book.Id)
             {
@@ -116,7 +116,26 @@ namespace LibrarySystem.Controllers
             {
                 try
                 {
-                    _context.Update(book);
+                    var existingBook = await _context.Book.FindAsync(id);
+                    if (existingBook == null)
+                    {
+                        return NotFound();
+                    }
+
+                    existingBook.Title = book.Title;
+                    existingBook.Description = book.Description;
+                    existingBook.AuthorId = book.AuthorId;
+
+                    if (ImageFile != null && ImageFile.Length > 0)
+                    {
+                        using (var memoryStream = new MemoryStream())
+                        {
+                            await ImageFile.CopyToAsync(memoryStream);
+                            existingBook.Image = memoryStream.ToArray();
+                        }
+                    }
+
+                    _context.Update(existingBook);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
@@ -132,8 +151,9 @@ namespace LibrarySystem.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["AuthorId"] = new SelectList(_context.Set<Author>(), "Id", "Id", book.AuthorId);
+            ViewData["AuthorId"] = new SelectList(_context.Set<Author>(), "Id", "Name", book.AuthorId);
             return View(book);
+
         }
 
         // GET: Books/Delete/5

@@ -169,7 +169,7 @@ namespace LibrarySystem.Tests
             await _context.SaveChangesAsync();
 
             // Act
-            var result = await _controller.Edit(1, book);
+            var result = await _controller.Edit(1, book, null);
 
             // Assert
             ClassicAssert.IsInstanceOf<RedirectToActionResult>(result);
@@ -188,7 +188,7 @@ namespace LibrarySystem.Tests
             await _context.SaveChangesAsync();
 
             // Act
-            var result = await _controller.Edit(1, book);
+            var result = await _controller.Edit(1, book, null);
 
             // Assert
             ClassicAssert.IsInstanceOf<ViewResult>(result);

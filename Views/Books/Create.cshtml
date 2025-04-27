@@ -1,49 +1,85 @@
 ﻿@model LibrarySystem.Models.Book
 
 @{
-    ViewData["Title"] = "Create Book";
+	ViewData["Title"] = "Create Book";
 }
 
 <div class="container mt-4 p-4 rounded shadow-sm" style="background-color: #f8f9fa;">
-    <h1 class="mb-4">Create New Book</h1>
+	<h1 class="mb-4">Create New Book</h1>
 
-    <form asp-action="Create" enctype="multipart/form-data" method="post">
-        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+	<form asp-action="Create" enctype="multipart/form-data" method="post">
+		<div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
-        <div class="mb-3">
-            <label asp-for="Title" class="form-label">Title</label>
-            <input asp-for="Title" class="form-control" placeholder="Enter book title" />
-            <span asp-validation-for="Title" class="text-danger"></span>
-        </div>
+		<div class="row" style="min-height: 400px;">
+			<!-- Left Side: Form Fields -->
+			<div class="col-md-7 d-flex flex-column justify-content-between">
+				<div>
+					<div class="mb-3">
+						<label asp-for="Title" class="form-label">Title</label>
+						<input asp-for="Title" class="form-control" placeholder="Enter book title" />
+						<span asp-validation-for="Title" class="text-danger"></span>
+					</div>
 
-        <div class="mb-3">
-            <label asp-for="Description" class="form-label">Description</label>
-            <input asp-for="Description" class="form-control" placeholder="Enter book description" />
-            <span asp-validation-for="Description" class="text-danger"></span>
-        </div>
+					<div class="mb-3">
+						<label asp-for="Description" class="form-label">Description</label>
+						<textarea asp-for="Description" class="form-control" placeholder="Enter book description" rows="4"></textarea>
+						<span asp-validation-for="Description" class="text-danger"></span>
+					</div>
 
-        <div class="mb-3">
-            <label asp-for="AuthorId" class="form-label">Author</label>
-            <select asp-for="AuthorId" class="form-select" asp-items="@(ViewData["AuthorId"] as SelectList)">
-                <option value="">-- Select Author --</option>
-            </select>
-            <span asp-validation-for="AuthorId" class="text-danger"></span>
-        </div>
+					<div class="mb-3">
+						<label asp-for="AuthorId" class="form-label">Author</label>
+						<select asp-for="AuthorId" class="form-select" asp-items="@(ViewData["AuthorId"] as SelectList)">
+							<option value="">-- Select Author --</option>
+						</select>
+						<span asp-validation-for="AuthorId" class="text-danger"></span>
+					</div>
 
-        <div class="form-group">
-            <label for="ImageFile" class="control-label">Book Image</label>
-            <input type="file" name="ImageFile" class="form-control" />
-        </div>
+					<div class="form-group mb-3">
+						<label for="ImageFile" class="form-label">Book Image</label>
+						<input type="file" name="ImageFile" class="form-control" id="ImageFileInput" onchange="previewImage(event)" />
+					</div>
+				</div>
 
-        <div class="d-flex gap-2">
-            <button type="submit" class="btn btn-primary">Create</button>
-            <a asp-action="Index" class="btn btn-secondary">Back to List</a>
-        </div>
-    </form>
+				<!-- Buttons at the bottom -->
+				<div class="d-flex gap-2 pt-3">
+					<button type="submit" class="btn btn-primary">Create</button>
+					<a asp-action="Index" class="btn btn-secondary">Back to List</a>
+				</div>
+			</div>
+
+			<!-- Right Side: Image Display -->
+			<div class="col-md-5 d-flex align-items-center justify-content-center">
+				<img id="ImagePreview" class="rounded shadow img-fluid" style="max-height: 400px; width: auto; display: none;" />
+				<p id="NoImageText" class="text-muted" style="display: none;">No image selected</p>
+			</div>
+		</div>
+	</form>
 </div>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+	@{
+		await Html.RenderPartialAsync("_ValidationScriptsPartial");
+	}
 }
+
+<script>
+	// Function to preview the uploaded image
+	function previewImage(event) {
+		const file = event.target.files[0];
+		const preview = document.getElementById('ImagePreview');
+		const noImageText = document.getElementById('NoImageText');
+
+		if (file) {
+			const reader = new FileReader();
+			reader.onload = function(e) {
+				preview.src = e.target.result;
+				preview.style.display = 'block'; // Show the image preview
+				noImageText.style.display = 'none'; // Hide the "No image" text
+			}
+			reader.readAsDataURL(file);
+		} else {
+			preview.style.display = 'none'; // Hide the image preview if no file is selected
+			noImageText.style.display = 'block'; // Show the "No image" text
+		}
+	}
+</script>

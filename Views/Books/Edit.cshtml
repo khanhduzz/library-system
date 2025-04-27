@@ -1,46 +1,72 @@
 ﻿@model LibrarySystem.Models.Book
 
 @{
-    ViewData["Title"] = "Edit Book";
+	ViewData["Title"] = "Edit Book";
 }
 
 <div class="container mt-4 p-4 rounded shadow-sm" style="background-color: #f8f9fa;">
-    <h1 class="mb-4">Edit Book</h1>
+	<h1 class="mb-4">Edit Book</h1>
 
-    <form asp-action="Edit">
-        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+	<form asp-action="Edit" enctype="multipart/form-data">
+		<div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+		<input type="hidden" asp-for="Id" />
 
-        <input type="hidden" asp-for="Id" />
+		<div class="row" style="min-height: 400px;">
+			<!-- Left Side: Form Fields -->
+			<div class="col-md-7 d-flex flex-column justify-content-between">
+				<div>
+					<div class="mb-3">
+						<label asp-for="Title" class="form-label">Title</label>
+						<input asp-for="Title" class="form-control" placeholder="Enter book title" />
+						<span asp-validation-for="Title" class="text-danger"></span>
+					</div>
 
-        <div class="mb-3">
-            <label asp-for="Title" class="form-label">Title</label>
-            <input asp-for="Title" class="form-control" placeholder="Enter book title" />
-            <span asp-validation-for="Title" class="text-danger"></span>
-        </div>
+					<div class="mb-3">
+						<label asp-for="Description" class="form-label">Description</label>
+						<textarea asp-for="Description" class="form-control" placeholder="Enter book description" rows="4"></textarea>
+						<span asp-validation-for="Description" class="text-danger"></span>
+					</div>
 
-        <div class="mb-3">
-            <label asp-for="Description" class="form-label">Description</label>
-            <input asp-for="Description" class="form-control" placeholder="Enter description" />
-            <span asp-validation-for="Description" class="text-danger"></span>
-        </div>
+					<div class="mb-3">
+						<label asp-for="AuthorId" class="form-label">Author</label>
+						<select asp-for="AuthorId" class="form-select" asp-items="ViewBag.AuthorId">
+							<option value="">-- Select Author --</option>
+						</select>
+						<span asp-validation-for="AuthorId" class="text-danger"></span>
+					</div>
 
-        <div class="mb-3">
-            <label asp-for="AuthorId" class="form-label">Author</label>
-            <select asp-for="AuthorId" class="form-select" asp-items="ViewBag.AuthorId">
-                <option value="">-- Select Author --</option>
-            </select>
-            <span asp-validation-for="AuthorId" class="text-danger"></span>
-        </div>
+					<div class="mb-3">
+						<label class="form-label">Change Image (optional):</label>
+						<input type="file" name="ImageFile" class="form-control" />
+					</div>
+				</div>
 
-        <div class="d-flex gap-2">
-            <button type="submit" class="btn btn-primary">Save</button>
-            <a asp-action="Index" class="btn btn-secondary">Back to List</a>
-        </div>
-    </form>
+				<!-- Buttons at the bottom -->
+				<div class="d-flex gap-2 pt-3">
+					<button type="submit" class="btn btn-primary">Save</button>
+					<a asp-action="Index" class="btn btn-secondary">Back to List</a>
+				</div>
+			</div>
+
+			<!-- Right Side: Image Display -->
+			<div class="col-md-5 d-flex align-items-center justify-content-center">
+				@if (Model.Image != null)
+				{
+					<img src="data:image/jpeg;base64,@Convert.ToBase64String(Model.Image)"
+						 class="rounded shadow img-fluid"
+						 style="max-height: 400px; width: auto;" />
+				}
+				else
+				{
+					<p class="text-muted">No image available</p>
+				}
+			</div>
+		</div>
+	</form>
 </div>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+	@{
+		await Html.RenderPartialAsync("_ValidationScriptsPartial");
+	}
 }
