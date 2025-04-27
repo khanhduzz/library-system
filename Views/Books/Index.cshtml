@@ -1,62 +1,125 @@
-﻿@model IEnumerable<LibrarySystem.Models.Book>
+﻿@model LibrarySystem.Helpers.PaginatedList<LibrarySystem.Models.Book>
 
 @{
 	ViewData["Title"] = "Index";
 }
 
-<div class="container mt-4 p-4 rounded shadow-sm" style="background-color: #f8f9fa;">
-	<h1 class="mb-4">Books</h1>
+<div class="d-flex flex-column" style="min-height: 90vh">
+	<!-- Content container -->
+	<div class="container mt-4 p-4 rounded shadow-sm flex-grow-1" style="background-color: #f8f9fa;">
+		<h1 class="mb-4">Books</h1>
 
-	<admin-only>
-		<a asp-action="Create" class="btn btn-primary mb-3">+ Create New Book</a>
-	</admin-only>
+		<div class="row mb-3">
+			<div class="col-md-8">
+				<form asp-action="Index" method="get" class="d-flex">
+					<input type="text" name="searchString" value="@Model.SearchString" class="form-control me-2" placeholder="Search books..." />
+					<button type="submit" class="btn btn-primary">Search</button>
+				</form>
+			</div>
+			<div class="col-md-4 text-end">
+				<admin-only>
+					<a asp-action="Create" class="btn btn-success">+ Create New Book</a>
+				</admin-only>
+			</div>
+		</div>
 
-	<table class="table table-bordered table-striped">
-		<thead class="thead-dark">
-			<tr>
-				<th>@Html.DisplayNameFor(model => model.First().Title)</th>
-				<th>@Html.DisplayNameFor(model => model.First().Description)</th>
-				<th>@Html.DisplayNameFor(model => model.First().Author)</th>
-				<th class="text-center">Actions</th>
-			</tr>
-		</thead>
-		<tbody>
-			@foreach (var item in Model)
-			{
+		<table class="table table-bordered table-striped">
+			<thead class="thead-dark">
 				<tr>
-					<td>@Html.DisplayFor(modelItem => item.Title)</td>
-					<td>@Html.DisplayFor(modelItem => item.Description)</td>
-					<td>@Html.DisplayFor(modelItem => item.Author.Name)</td>
-					<td class="d-inline-flex justify-content-center w-100 gap-2">
-						<a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info btn-sm text-white">
-							<i class="bi bi-info-circle me-1"></i>Details
-						</a>
-						<admin-only>
-							<a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-primary btn-sm">
-								<i class="bi bi-pencil-square me-1"></i>Edit
-							</a>
-							<a href="#" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal" data-id="@item.Id" data-title="@item.Title">
-								<i class="bi bi-trash me-1"></i>Delete
-							</a>
-						</admin-only>
-					</td>
+					<th>@Html.DisplayNameFor(model => model.First().Title)</th>
+					<th>@Html.DisplayNameFor(model => model.First().Description)</th>
+					<th>@Html.DisplayNameFor(model => model.First().Author)</th>
+					<th class="text-center">Actions</th>
 				</tr>
+			</thead>
+			<tbody>
+				@foreach (var item in Model)
+				{
+					<tr>
+						<td>@Html.DisplayFor(modelItem => item.Title)</td>
+						<td>@Html.DisplayFor(modelItem => item.Description)</td>
+						<td>@Html.DisplayFor(modelItem => item.Author.Name)</td>
+						<td class="d-inline-flex justify-content-center w-100 gap-2">
+							<a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info btn-sm text-white">
+								<i class="bi bi-info-circle me-1"></i>Details
+							</a>
+							<admin-only>
+								<a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-primary btn-sm">
+									<i class="bi bi-pencil-square me-1"></i>Edit
+								</a>
+								<a href="#" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal" data-id="@item.Id" data-title="@item.Title">
+									<i class="bi bi-trash me-1"></i>Delete
+								</a>
+							</admin-only>
+						</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+	</div>
+
+	<!-- Pagination Section -->
+	<nav aria-label="Page navigation" class="mt-4">
+		<ul class="pagination justify-content-center">
+			@if (Model.HasPreviousPage && Model.PageIndex > 2 && Model.TotalPages > 5)
+			{
+				<li class="page-item">
+					<a class="page-link" asp-action="Index" asp-route-page="1" asp-route-searchString="@Model.SearchString">1</a>
+				</li>
 			}
-		</tbody>
-	</table>
+			@if (Model.HasPreviousPage)
+			{
+				<li class="page-item">
+					<a class="page-link" asp-action="Index" asp-route-page="@(Model.PageIndex - 1)" asp-route-searchString="@Model.SearchString">&laquo;</a> <!-- << -->
+				</li>
+			}
+
+			@for (int i = 1; i <= Model.TotalPages; i++)
+			{
+				// Only show few surrounding pages
+				if (Model.TotalPages <= 5 || (i >= Model.PageIndex - 1 && i <= Model.PageIndex + 1))
+				{
+					<li class="page-item @(i == Model.PageIndex ? "active" : "")">
+						<a class="page-link" asp-action="Index" asp-route-page="@i" asp-route-searchString="@Model.SearchString">@i</a>
+					</li>
+				}
+				else if (i == 2 && Model.PageIndex > 4)
+				{
+					<li class="page-item disabled"><span class="page-link">...</span></li>
+				}
+				else if (i == Model.TotalPages - 1 && Model.PageIndex < Model.TotalPages - 3)
+				{
+					<li class="page-item disabled"><span class="page-link">...</span></li>
+				}
+			}
+
+			@if (Model.HasNextPage)
+			{
+				<li class="page-item">
+					<a class="page-link" asp-action="Index" asp-route-page="@(Model.PageIndex + 1)" asp-route-searchString="@Model.SearchString">&raquo;</a> <!-- >> -->
+				</li>
+			}
+			@if (Model.HasNextPage && Model.PageIndex < Model.TotalPages - 1 && Model.TotalPages > 5)
+			{
+				<li class="page-item">
+					<a class="page-link" asp-action="Index" asp-route-page="@Model.TotalPages" asp-route-searchString="@Model.SearchString">@Model.TotalPages</a>
+				</li>
+			}
+		</ul>
+	</nav>
+
+
 </div>
 
+<!-- Admin-only Delete Modal -->
 <admin-only>
-	<!-- Delete Confirmation Modal -->
 	<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
 		<div class="modal-dialog">
 			<div class="modal-content">
 				<form id="deleteForm" method="post">
 					<div class="modal-header bg-primary text-white">
 						<h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
-						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">
-							<span aria-hidden="true">&times;</span>
-						</button>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 					</div>
 					<div class="modal-body">
 						Are you sure you want to delete the book "<span id="modalBookTitle"></span>"?

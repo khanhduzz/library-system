@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using LibrarySystem.Data;
 using LibrarySystem.Models;
 using Microsoft.AspNetCore.Authorization;
+using LibrarySystem.Helpers;
 
 namespace LibrarySystem.Controllers
 {
@@ -22,13 +23,22 @@ namespace LibrarySystem.Controllers
         }
 
         // GET: Books
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string? searchString, int page = 1, int pageSize = 2)
         {
-            var librarySystemContext = _context.Book.Include(b => b.Author);
-            return View(await librarySystemContext.ToListAsync());
+            var booksQuery = _context.Book.Include(b => b.Author).AsQueryable();
+
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                booksQuery = booksQuery.Where(b => b.Title.Contains(searchString) || b.Author.Name.Contains(searchString));
+            }
+
+            var paginatedBooks = await PaginatedList<Book>.CreateAsync(booksQuery.OrderBy(b => b.Title), page, pageSize, searchString);
+
+            return View(paginatedBooks);
         }
 
         // GET: Books/Details/5
+        [AllowAnonymous]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
