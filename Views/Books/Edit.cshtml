@@ -16,19 +16,19 @@
 			<div class="col-md-7 d-flex flex-column justify-content-between">
 				<div>
 					<div class="mb-3">
-						<label asp-for="Title" class="form-label">Title</label>
+						<label asp-for="Title" class="form-label fw-bold">Title</label>
 						<input asp-for="Title" class="form-control" placeholder="Enter book title" />
 						<span asp-validation-for="Title" class="text-danger"></span>
 					</div>
 
 					<div class="mb-3">
-						<label asp-for="Description" class="form-label">Description</label>
+						<label asp-for="Description" class="form-label fw-bold">Description</label>
 						<textarea asp-for="Description" class="form-control" placeholder="Enter book description" rows="4"></textarea>
 						<span asp-validation-for="Description" class="text-danger"></span>
 					</div>
 
 					<div class="mb-3">
-						<label asp-for="AuthorId" class="form-label">Author</label>
+						<label asp-for="AuthorId" class="form-label fw-bold">Author</label>
 						<select asp-for="AuthorId" class="form-select" asp-items="ViewBag.AuthorId">
 							<option value="">-- Select Author --</option>
 						</select>
@@ -36,8 +36,8 @@
 					</div>
 
 					<div class="mb-3">
-						<label class="form-label">Change Image (optional):</label>
-						<input type="file" name="ImageFile" class="form-control" />
+						<label class="form-label fw-bold">Change Image (optional):</label>
+						<input type="file" name="ImageFile" class="form-control" id="ImageFileInput" onchange="previewImage(event)" />
 					</div>
 				</div>
 
@@ -52,14 +52,18 @@
 			<div class="col-md-5 d-flex align-items-center justify-content-center">
 				@if (Model.Image != null)
 				{
-					<img src="data:image/jpeg;base64,@Convert.ToBase64String(Model.Image)"
+					<img id="ImagePreview" src="data:image/jpeg;base64,@Convert.ToBase64String(Model.Image)"
 						 class="rounded shadow img-fluid"
 						 style="max-height: 400px; width: auto;" />
 				}
 				else
 				{
-					<p class="text-muted">No image available</p>
+					<p id="NoImageText" class="text-muted">No image available</p>
 				}
+
+				<!-- Image Preview (hidden initially) -->
+				<img id="ImagePreview" class="rounded shadow img-fluid" style="height: 400px; width: auto; display: none;" />
+				<p id="NoImageText" class="text-muted" style="display: none;">No image selected</p>
 			</div>
 		</div>
 	</form>
@@ -70,3 +74,43 @@
 		await Html.RenderPartialAsync("_ValidationScriptsPartial");
 	}
 }
+
+<script>
+	// Function to preview the uploaded image
+	function previewImage(event) {
+		const file = event.target.files[0];
+		const preview = document.getElementById('ImagePreview');
+		const noImageText = document.getElementById('NoImageText');
+
+		// If a new file is selected, show the preview and hide "No image" text
+		if (file) {
+			const reader = new FileReader();
+			reader.onload = function(e) {
+				preview.src = e.target.result;
+				preview.style.display = 'block'; // Show the image preview
+				noImageText.style.display = 'none'; // Hide the "No image" text
+			}
+			reader.readAsDataURL(file);
+		} else {
+			// If no file is selected, hide the preview and show the fallback text
+			preview.style.display = 'none'; // Hide the image preview if no file is selected
+			noImageText.style.display = 'block'; // Show the "No image" text
+		}
+	}
+
+	// On page load, if there is no image selected and an existing image is present, show it
+	window.onload = function() {
+		const preview = document.getElementById('ImagePreview');
+		const noImageText = document.getElementById('NoImageText');
+		const imageFileInput = document.getElementById('ImageFileInput');
+
+		// Check if there's an image already assigned to the book model (on page load)
+		if (preview.src !== "" && preview.src !== null && preview.src.includes('data:image')) {
+			// Hide the "No image available" text if an image exists
+			noImageText.style.display = 'none';
+		} else {
+			// Show the fallback "No image available" text if there's no image preview
+			noImageText.style.display = 'block';
+		}
+	}
+</script>

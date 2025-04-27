@@ -88,7 +88,7 @@ namespace LibrarySystem.Tests
             var author = new Author { Id = 1, Name = "Author1" };
 
             // Act
-            var result = await _controller.Create(author);
+            var result = await _controller.Create(author, null);
 
             // Assert
             ClassicAssert.IsInstanceOf<RedirectToActionResult>(result);
@@ -104,7 +104,7 @@ namespace LibrarySystem.Tests
             _controller.ModelState.AddModelError("Name", "Required");
 
             // Act
-            var result = await _controller.Create(author);
+            var result = await _controller.Create(author, null);
 
             // Assert
             ClassicAssert.IsInstanceOf<ViewResult>(result);
@@ -148,7 +148,7 @@ namespace LibrarySystem.Tests
             await _context.SaveChangesAsync();
 
             // Act
-            var result = await _controller.Edit(1, author);
+            var result = await _controller.Edit(1, author, null);
 
             // Assert
             ClassicAssert.IsInstanceOf<RedirectToActionResult>(result);
@@ -164,7 +164,7 @@ namespace LibrarySystem.Tests
             _controller.ModelState.AddModelError("Name", "Required");
 
             // Act
-            var result = await _controller.Edit(1, author);
+            var result = await _controller.Edit(1, author, null);
 
             // Assert
             ClassicAssert.IsInstanceOf<ViewResult>(result);

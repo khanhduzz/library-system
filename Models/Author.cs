@@ -15,5 +15,6 @@ namespace LibrarySystem.Models
         public string Description { get; set; } = string.Empty;
 
         public ICollection<Book>? Books { get; set; } = new List<Book>();
+        public byte[]? Image { get; set; }
     }
 }

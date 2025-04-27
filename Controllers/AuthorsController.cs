@@ -1,7 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -53,15 +54,23 @@ namespace LibrarySystem.Controllers
         }
 
         // POST: Authors/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Create([Bind("Id,Name,Description")] Author author)
+        public async Task<IActionResult> Create([Bind("Id,Name,Description")] Author author, IFormFile? ImageFile)
         {
             if (ModelState.IsValid)
             {
+                // Handle image upload
+                if (ImageFile != null && ImageFile.Length > 0)
+                {
+                    using (var memoryStream = new MemoryStream())
+                    {
+                        await ImageFile.CopyToAsync(memoryStream);
+                        author.Image = memoryStream.ToArray();  // Assuming Image is a byte array
+                    }
+                }
+
                 _context.Add(author);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -87,12 +96,10 @@ namespace LibrarySystem.Controllers
         }
 
         // POST: Authors/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description")] Author author)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description")] Author author, IFormFile? ImageFile)
         {
             if (id != author.Id)
             {
@@ -103,7 +110,26 @@ namespace LibrarySystem.Controllers
             {
                 try
                 {
-                    _context.Update(author);
+                    var existingAuthor = await _context.Author.FindAsync(id);
+                    if (existingAuthor == null)
+                    {
+                        return NotFound();
+                    }
+
+                    existingAuthor.Name = author.Name;
+                    existingAuthor.Description = author.Description;
+
+                    // Handle image upload
+                    if (ImageFile != null && ImageFile.Length > 0)
+                    {
+                        using (var memoryStream = new MemoryStream())
+                        {
+                            await ImageFile.CopyToAsync(memoryStream);
+                            existingAuthor.Image = memoryStream.ToArray();  // Assuming Image is a byte array
+                        }
+                    }
+
+                    _context.Update(existingAuthor);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
