@@ -100,7 +100,7 @@ namespace LibrarySystem.Tests
             await _context.SaveChangesAsync();
 
             // Act
-            var result = await _controller.Create(book, null);
+            var result = await _controller.Create(book, null, new List<int>());
 
             // Assert
             ClassicAssert.IsInstanceOf<RedirectToActionResult>(result);
@@ -119,7 +119,7 @@ namespace LibrarySystem.Tests
             await _context.SaveChangesAsync();
 
             // Act
-            var result = await _controller.Create(book, null);
+            var result = await _controller.Create(book, null, new List<int>());
 
             // Assert
             ClassicAssert.IsInstanceOf<ViewResult>(result);
@@ -169,7 +169,7 @@ namespace LibrarySystem.Tests
             await _context.SaveChangesAsync();
 
             // Act
-            var result = await _controller.Edit(1, book, null);
+            var result = await _controller.Edit(1, book, null, new List<int>());
 
             // Assert
             ClassicAssert.IsInstanceOf<RedirectToActionResult>(result);
@@ -188,7 +188,7 @@ namespace LibrarySystem.Tests
             await _context.SaveChangesAsync();
 
             // Act
-            var result = await _controller.Edit(1, book, null);
+            var result = await _controller.Edit(1, book, null, new List<int>());
 
             // Assert
             ClassicAssert.IsInstanceOf<ViewResult>(result);

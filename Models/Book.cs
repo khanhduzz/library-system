@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using LibrarySystem.Enums;
 
 namespace LibrarySystem.Models
 {
@@ -14,5 +15,22 @@ namespace LibrarySystem.Models
         public int? AuthorId { get; set; }
         public Author? Author { get; set; }
         public byte[]? Image { get; set; }
+        [Required]
+        public string ISBN { get; set; } = string.Empty;
+
+        public DateTime PublishDate { get; set; }
+        public ICollection<BookGenre> BookGenres { get; set; } = new List<BookGenre>();
+
+        public bool IsAvailable { get; set; } = true;
+
+        public DateTime? BorrowedDate { get; set; }
+
+        public DateTime? DueDate { get; set; }
+
+        public int? BorrowerId { get; set; }
+
+        public int BorrowCount { get; set; } = 0;
+
+        public BookCondition Condition { get; set; } = BookCondition.New;
     }
 }

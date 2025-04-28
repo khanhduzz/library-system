@@ -9,6 +9,7 @@ using LibrarySystem.Data;
 using LibrarySystem.Models;
 using Microsoft.AspNetCore.Authorization;
 using LibrarySystem.Helpers;
+using LibrarySystem.Enums;
 
 namespace LibrarySystem.Controllers
 {
@@ -62,6 +63,8 @@ namespace LibrarySystem.Controllers
         public IActionResult Create()
         {
             ViewData["AuthorId"] = new SelectList(_context.Set<Author>(), "Id", "Name");
+            ViewData["Genres"] = new MultiSelectList(_context.Genre, "Id", "Name"); // <-- new for genres
+            ViewData["ConditionList"] = new SelectList(Enum.GetValues(typeof(BookCondition)));
             return View();
         }
 
@@ -71,7 +74,7 @@ namespace LibrarySystem.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Create([Bind("Id,Title,Description,AuthorId")] Book book, IFormFile? ImageFile)
+        public async Task<IActionResult> Create([Bind("Title,Description,AuthorId,ISBN,PublishDate,IsAvailable,Condition")] Book book, IFormFile? ImageFile, List<int>? selectedGenres)
         {
             if (ModelState.IsValid)
             {
@@ -83,11 +86,20 @@ namespace LibrarySystem.Controllers
                         book.Image = memoryStream.ToArray();
                     }
                 }
+
+                if (selectedGenres != null)
+                {
+                    book.BookGenres = selectedGenres.Select(g => new BookGenre { GenreId = g }).ToList();
+                }
+
                 _context.Add(book);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+
             ViewData["AuthorId"] = new SelectList(_context.Set<Author>(), "Id", "Name", book?.AuthorId);
+            ViewData["Genres"] = new MultiSelectList(_context.Genre, "Id", "Name", selectedGenres);
+            ViewData["ConditionList"] = new SelectList(Enum.GetValues(typeof(BookCondition)), book?.Condition);
             return View(book);
         }
 
@@ -100,12 +112,18 @@ namespace LibrarySystem.Controllers
                 return NotFound();
             }
 
-            var book = await _context.Book.FindAsync(id);
+            var book = await _context.Book
+                .Include(b => b.BookGenres)
+                .FirstOrDefaultAsync(b => b.Id == id);
+
             if (book == null)
             {
                 return NotFound();
             }
+
             ViewData["AuthorId"] = new SelectList(_context.Set<Author>(), "Id", "Name", book.AuthorId);
+            ViewData["Genres"] = new MultiSelectList(_context.Genre, "Id", "Name", book.BookGenres.Select(bg => bg.GenreId));
+            ViewData["ConditionList"] = new SelectList(Enum.GetValues(typeof(BookCondition)), book.Condition);
             return View(book);
         }
 
@@ -115,9 +133,9 @@ namespace LibrarySystem.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Description,AuthorId")] Book book, IFormFile? ImageFile)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Description,AuthorId,ISBN,PublishDate,IsAvailable,Condition")] Book updatedBook, IFormFile? ImageFile, List<int>? selectedGenres)
         {
-            if (id != book.Id)
+            if (id != updatedBook.Id)
             {
                 return NotFound();
             }
@@ -126,31 +144,48 @@ namespace LibrarySystem.Controllers
             {
                 try
                 {
-                    var existingBook = await _context.Book.FindAsync(id);
-                    if (existingBook == null)
+                    var book = await _context.Book
+                        .Include(b => b.BookGenres)
+                        .FirstOrDefaultAsync(b => b.Id == id);
+
+                    if (book == null)
                     {
                         return NotFound();
                     }
 
-                    existingBook.Title = book.Title;
-                    existingBook.Description = book.Description;
-                    existingBook.AuthorId = book.AuthorId;
+                    book.Title = updatedBook.Title;
+                    book.Description = updatedBook.Description;
+                    book.AuthorId = updatedBook.AuthorId;
+                    book.ISBN = updatedBook.ISBN;
+                    book.PublishDate = updatedBook.PublishDate;
+                    book.IsAvailable = updatedBook.IsAvailable;
+                    book.Condition = updatedBook.Condition;
 
                     if (ImageFile != null && ImageFile.Length > 0)
                     {
                         using (var memoryStream = new MemoryStream())
                         {
                             await ImageFile.CopyToAsync(memoryStream);
-                            existingBook.Image = memoryStream.ToArray();
+                            book.Image = memoryStream.ToArray();
                         }
                     }
 
-                    _context.Update(existingBook);
+                    // Update genres
+                    book.BookGenres.Clear();
+                    if (selectedGenres != null)
+                    {
+                        foreach (var genreId in selectedGenres)
+                        {
+                            book.BookGenres.Add(new BookGenre { GenreId = genreId });
+                        }
+                    }
+
+                    _context.Update(book);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!BookExists(book.Id))
+                    if (!BookExists(updatedBook.Id))
                     {
                         return NotFound();
                     }
@@ -161,9 +196,11 @@ namespace LibrarySystem.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["AuthorId"] = new SelectList(_context.Set<Author>(), "Id", "Name", book.AuthorId);
-            return View(book);
 
+            ViewData["AuthorId"] = new SelectList(_context.Set<Author>(), "Id", "Name", updatedBook.AuthorId);
+            ViewData["Genres"] = new MultiSelectList(_context.Genre, "Id", "Name", selectedGenres);
+            ViewData["ConditionList"] = new SelectList(Enum.GetValues(typeof(BookCondition)), updatedBook.Condition);
+            return View(updatedBook);
         }
 
         // GET: Books/Delete/5
