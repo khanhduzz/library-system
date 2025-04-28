@@ -76,6 +76,11 @@ namespace LibrarySystem.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create([Bind("Title,Description,AuthorId,ISBN,PublishDate,IsAvailable,Condition")] Book book, IFormFile? ImageFile, List<int>? selectedGenres)
         {
+            if (await _context.Book.AnyAsync(b => b.ISBN == book.ISBN))
+            {
+                ModelState.AddModelError("ISBN", "ISBN already exists. Please enter a unique ISBN.");
+            }
+
             if (ModelState.IsValid)
             {
                 if (ImageFile != null && ImageFile.Length > 0)
@@ -102,6 +107,7 @@ namespace LibrarySystem.Controllers
             ViewData["ConditionList"] = new SelectList(Enum.GetValues(typeof(BookCondition)), book?.Condition);
             return View(book);
         }
+
 
         // GET: Books/Edit/5
         [Authorize(Roles = "Admin")]
