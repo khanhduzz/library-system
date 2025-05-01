@@ -32,7 +32,17 @@
 					</select>
 					<span asp-validation-for="AuthorId" class="text-danger"></span>
 				</div>
+			</div>
 
+			<!-- Right Side -->
+			<div class="col-md-5 d-flex flex-column justify-content-between">
+				<div class="mb-3 d-flex justify-content-center align-items-center" style="min-height: 300px;">
+					<img id="ImagePreview" class="rounded shadow img-fluid" style="height: 300px; width: auto; object-fit: cover; display: none;" />
+					<p id="NoImageText" class="text-muted" style="display: block;">No image selected</p>
+				</div>
+			</div>
+
+			<div class="col-md-7 d-flex flex-column">
 				<div class="mb-3">
 					<label asp-for="ISBN" class="form-label fw-bold">ISBN</label>
 					<input asp-for="ISBN" class="form-control" placeholder="Enter book ISBN" />
@@ -45,20 +55,16 @@
 					<span asp-validation-for="PublishDate" class="text-danger"></span>
 				</div>
 
-				<div class="d-flex gap-2 pt-3 mt-auto">
-					<button type="submit" class="btn btn-primary">Create</button>
-					<a asp-action="Index" class="btn btn-secondary">Back to List</a>
+				<label class="form-label fw-bold">Available for rent</label>
+				<div class="mb-3 form-check">
+					<input asp-for="IsAvailable" type="checkbox" class="form-check-input" />
+					<label asp-for="IsAvailable" class="form-check-label">Is Available</label>
 				</div>
+
 			</div>
 
-			<!-- Right Side: Image Preview and Additional Fields -->
-			<div class="col-md-5 d-flex flex-column justify-content-between">
-				<div class="mb-3 d-flex justify-content-center align-items-center" style="min-height: 300px;">
-					<img id="ImagePreview" class="rounded shadow img-fluid" style="height: 300px; width: auto; object-fit: cover; display: none;" />
-					<p id="NoImageText" class="text-muted" style="display: block;">No image selected</p>
-				</div>
-
-				<!-- Image, Genres, IsAvailable, and Condition Below -->
+			<!-- Right Side -->
+			<div class="col-md-5 d-flex flex-column">
 				<div class="mb-3">
 					<label for="ImageFileInput" class="form-label fw-bold">Book Image</label>
 					<input type="file" name="ImageFile" id="ImageFileInput" class="form-control" onchange="previewImage(event)" />
@@ -66,24 +72,8 @@
 
 				<div class="mb-3">
 					<label class="form-label fw-bold">Genres</label>
-					<select id="GenreSelect" name="selectedGenres"
-							class="selectpicker"
-							asp-items="ViewBag.Genres"
-							multiple
-							data-live-search="false"
-							data-actions-box="false"
-							data-dropup-auto="false"
-							title="Select Genres">
+					<select id="GenreSelect" name="selectedGenres" class="selectpicker form-control" asp-items="ViewBag.Genres" multiple title="Select Genres">
 					</select>
-				</div>
-
-				@* <div id="SelectedGenres" class="d-flex flex-wrap gap-2 mt-2"> *@
-				@* 	<!-- Selected genres will appear here as badges --> *@
-				@* </div> *@
-
-				<div class="mb-3 form-check">
-					<input asp-for="IsAvailable" type="checkbox" class="form-check-input" />
-					<label asp-for="IsAvailable" class="form-check-label">Is Available</label>
 				</div>
 
 				<div class="mb-3">
@@ -93,6 +83,11 @@
 					</select>
 				</div>
 			</div>
+		</div>
+
+		<div class="d-flex gap-2 pt-3 mt-auto">
+			<button type="submit" class="btn btn-primary">Create</button>
+			<a asp-action="Index" class="btn btn-secondary">Back to List</a>
 		</div>
 	</form>
 </div>
@@ -108,91 +103,42 @@
 		@if (!ViewData.ModelState.IsValid && ViewData.ModelState.ContainsKey("ISBN"))
 		{
 			<text>
-					Swal.fire({
-						icon: 'error',
-						title: 'Duplicate ISBN',
-						text: '@ViewData.ModelState["ISBN"]?.Errors.FirstOrDefault()?.ErrorMessage',
-						width: '400px',
-						padding: '1.5rem',
-						confirmButtonColor: '#0d6efd',
-						confirmButtonText: 'OK',
-						customClass: {
-							popup: 'shadow rounded',
-							title: 'fs-4',
-							confirmButton: 'btn btn-primary'
-						}
-					});
+							Swal.fire({
+								icon: 'error',
+								title: 'Duplicate ISBN',
+								text: '@ViewData.ModelState["ISBN"]?.Errors.FirstOrDefault()?.ErrorMessage',
+								width: '400px',
+								padding: '1.5rem',
+								confirmButtonColor: '#0d6efd',
+								confirmButtonText: 'OK',
+								customClass: {
+									popup: 'shadow rounded',
+									title: 'fs-4',
+									confirmButton: 'btn btn-primary'
+								}
+							});
 			</text>
 		}
 	</script>
-}
 
-<style>
-	#GenreSelect {
-		max-height: 200px; /* Adjust height as needed */
-		overflow-y: auto;
-	}
-</style>
+	<script>
+		function previewImage(event) {
+			const file = event.target.files[0];
+			const preview = document.getElementById('ImagePreview');
+			const noImageText = document.getElementById('NoImageText');
 
-<script>
-	function previewImage(event) {
-		const file = event.target.files[0];
-		const preview = document.getElementById('ImagePreview');
-		const noImageText = document.getElementById('NoImageText');
-
-		if (file) {
-			const reader = new FileReader();
-			reader.onload = function (e) {
-				preview.src = e.target.result;
-				preview.style.display = 'block';
-				noImageText.style.display = 'none';
-			};
-			reader.readAsDataURL(file);
-		} else {
-			preview.style.display = 'none';
-			noImageText.style.display = 'block';
+			if (file) {
+				const reader = new FileReader();
+				reader.onload = function (e) {
+					preview.src = e.target.result;
+					preview.style.display = 'block';
+					noImageText.style.display = 'none';
+				};
+				reader.readAsDataURL(file);
+			} else {
+				preview.style.display = 'none';
+				noImageText.style.display = 'block';
+			}
 		}
-	}
-
-		function updateSelectedGenres() {
-		const genreSelect = document.getElementById('GenreSelect');
-		const selectedGenres = Array.from(genreSelect.selectedOptions).map(option => option.text);
-		const selectedGenresContainer = document.getElementById('SelectedGenres');
-
-		// Clear existing badges
-		selectedGenresContainer.innerHTML = '';
-
-		// Add new badges
-		selectedGenres.forEach(genre => {
-			const badge = document.createElement('span');
-			badge.classList.add('badge', 'bg-primary', 'rounded-pill');
-			badge.textContent = genre;
-
-			// Add a close button to remove badges
-			const closeButton = document.createElement('button');
-			closeButton.classList.add('btn-close', 'btn-close-white', 'ms-2');
-			closeButton.onclick = function () {
-				// Deselect the genre from the dropdown
-				const option = Array.from(genreSelect.options).find(option => option.text === genre);
-				if (option) {
-					option.selected = false;
-				}
-				$('#GenreSelect').selectpicker('refresh'); // Refresh the selectpicker UI
-
-				// Remove the badge
-				badge.remove();
-			};
-
-			badge.appendChild(closeButton);
-			selectedGenresContainer.appendChild(badge);
-		});
-	}
-
-	// Update genre list when the dropdown selection changes
-	document.getElementById('GenreSelect').addEventListener('change', updateSelectedGenres);
-
-	$(function () {
-		$('#GenreSelect').selectpicker('refresh');
-	});
-
-</script>
+	</script>
+}

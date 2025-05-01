@@ -11,60 +11,82 @@
 		<div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 		<input type="hidden" asp-for="Id" />
 
-		<div class="row" style="min-height: 400px;">
+		<div class="row">
 			<!-- Left Side: Form Fields -->
-			<div class="col-md-7 d-flex flex-column justify-content-between">
-				<div>
-					<div class="mb-3">
-						<label asp-for="Title" class="form-label fw-bold">Title</label>
-						<input asp-for="Title" class="form-control" placeholder="Enter book title" />
-						<span asp-validation-for="Title" class="text-danger"></span>
-					</div>
-
-					<div class="mb-3">
-						<label asp-for="Description" class="form-label fw-bold">Description</label>
-						<textarea asp-for="Description" class="form-control" placeholder="Enter book description" rows="4"></textarea>
-						<span asp-validation-for="Description" class="text-danger"></span>
-					</div>
-
-					<div class="mb-3">
-						<label asp-for="AuthorId" class="form-label fw-bold">Author</label>
-						<select asp-for="AuthorId" class="form-select" asp-items="ViewBag.AuthorId">
-							<option value="">-- Select Author --</option>
-						</select>
-						<span asp-validation-for="AuthorId" class="text-danger"></span>
-					</div>
-
-					<div class="mb-3">
-						<label class="form-label fw-bold">Change Image (optional):</label>
-						<input type="file" name="ImageFile" class="form-control" id="ImageFileInput" onchange="previewImage(event)" />
-					</div>
+			<div class="col-md-7 d-flex flex-column">
+				<div class="mb-3">
+					<label asp-for="Title" class="form-label fw-bold">Title</label>
+					<input asp-for="Title" class="form-control" placeholder="Enter book title" />
+					<span asp-validation-for="Title" class="text-danger"></span>
 				</div>
 
-				<!-- Buttons at the bottom -->
-				<div class="d-flex gap-2 pt-3">
-					<button type="submit" class="btn btn-primary">Save</button>
-					<a asp-action="Index" class="btn btn-secondary">Back to List</a>
+				<div class="mb-3">
+					<label asp-for="Description" class="form-label fw-bold">Description</label>
+					<textarea asp-for="Description" class="form-control" placeholder="Enter book description" rows="4"></textarea>
+					<span asp-validation-for="Description" class="text-danger"></span>
+				</div>
+
+				<div class="mb-3">
+					<label asp-for="AuthorId" class="form-label fw-bold">Author</label>
+					<select asp-for="AuthorId" class="form-select" asp-items="ViewBag.AuthorId">
+						<option value="">-- Select Author --</option>
+					</select>
+					<span asp-validation-for="AuthorId" class="text-danger"></span>
 				</div>
 			</div>
 
-			<!-- Right Side: Image Display -->
-			<div class="col-md-5 d-flex align-items-center justify-content-center">
-				@if (Model.Image != null)
-				{
-					<img id="ImagePreview" src="data:image/jpeg;base64,@Convert.ToBase64String(Model.Image)"
-						 class="rounded shadow img-fluid"
-						 style="height: 400px; width: auto;" />
-				}
-				else
-				{
-					<p id="NoImageText" class="text-muted">No image available</p>
-				}
-
-				<!-- Image Preview (hidden initially) -->
-				<img id="ImagePreview" class="rounded shadow img-fluid" style="height: 400px; width: auto; display: none;" />
-				<p id="NoImageText" class="text-muted" style="display: none;">No image selected</p>
+			<!-- Right Side: Image Preview -->
+			<div class="col-md-5 d-flex justify-content-center align-items-center">
+				<img id="ImagePreview"
+					 class="rounded shadow img-fluid"
+					 style="height: 300px; width: auto; object-fit: cover; @(Model.Image != null ? "" : "display: none;")"
+					 src="@(Model.Image != null ? $"data:image/jpeg;base64,{Convert.ToBase64String(Model.Image)}" : "")" />
+				<p id="NoImageText" class="text-muted" style="@(Model.Image != null ? "display: none;" : "display: block;")">No image selected</p>
 			</div>
+			<div class="col-md-7 d-flex flex-column">
+				<div class="mb-3">
+					<label asp-for="ISBN" class="form-label fw-bold">ISBN</label>
+					<input asp-for="ISBN" class="form-control" placeholder="Enter book ISBN" />
+					<span asp-validation-for="ISBN" class="text-danger"></span>
+				</div>
+
+				<div class="mb-3">
+					<label asp-for="PublishDate" class="form-label fw-bold">Publish Date</label>
+					<input asp-for="PublishDate" class="form-control" type="date" />
+					<span asp-validation-for="PublishDate" class="text-danger"></span>
+				</div>
+
+				<label class="form-label fw-bold">Available for rent</label>
+				<div class="mb-3 form-check">
+					<input asp-for="IsAvailable" type="checkbox" class="form-check-input" />
+					<label asp-for="IsAvailable" class="form-check-label">Is Available</label>
+				</div>
+			</div>
+
+			<div class="col-md-5 d-flex flex-column">
+				<div class="mb-3">
+					<label class="form-label fw-bold">Change Image (optional):</label>
+					<input type="file" name="ImageFile" class="form-control" id="ImageFileInput" onchange="previewImage(event)" />
+				</div>
+
+				<div class="mb-3">
+					<label class="form-label fw-bold">Genres</label>
+					<select id="GenreSelect" name="selectedGenres" class="selectpicker form-control" asp-items="ViewBag.Genres" multiple title="Select Genres">
+					</select>
+				</div>
+
+				<div class="mb-3">
+					<label asp-for="Condition" class="form-label fw-bold">Condition</label>
+					<select asp-for="Condition" class="form-select" asp-items="ViewBag.ConditionList">
+						<option value="">-- Select Condition --</option>
+					</select>
+				</div>
+			</div>
+		</div>
+
+		<div class="d-flex gap-2 pt-3 mt-auto">
+			<button type="submit" class="btn btn-primary">Save</button>
+			<a asp-action="Index" class="btn btn-secondary">Back to List</a>
 		</div>
 	</form>
 </div>
@@ -73,44 +95,25 @@
 	@{
 		await Html.RenderPartialAsync("_ValidationScriptsPartial");
 	}
-}
 
-<script>
-	// Function to preview the uploaded image
-	function previewImage(event) {
-		const file = event.target.files[0];
-		const preview = document.getElementById('ImagePreview');
-		const noImageText = document.getElementById('NoImageText');
+	<script>
+		function previewImage(event) {
+			const file = event.target.files[0];
+			const preview = document.getElementById('ImagePreview');
+			const noImageText = document.getElementById('NoImageText');
 
-		// If a new file is selected, show the preview and hide "No image" text
-		if (file) {
-			const reader = new FileReader();
-			reader.onload = function(e) {
-				preview.src = e.target.result;
-				preview.style.display = 'block'; // Show the image preview
-				noImageText.style.display = 'none'; // Hide the "No image" text
+			if (file) {
+				const reader = new FileReader();
+				reader.onload = function (e) {
+					preview.src = e.target.result;
+					preview.style.display = 'block';
+					noImageText.style.display = 'none';
+				};
+				reader.readAsDataURL(file);
+			} else {
+				preview.style.display = 'none';
+				noImageText.style.display = 'block';
 			}
-			reader.readAsDataURL(file);
-		} else {
-			// If no file is selected, hide the preview and show the fallback text
-			preview.style.display = 'none'; // Hide the image preview if no file is selected
-			noImageText.style.display = 'block'; // Show the "No image" text
 		}
-	}
-
-	// On page load, if there is no image selected and an existing image is present, show it
-	window.onload = function() {
-		const preview = document.getElementById('ImagePreview');
-		const noImageText = document.getElementById('NoImageText');
-		const imageFileInput = document.getElementById('ImageFileInput');
-
-		// Check if there's an image already assigned to the book model (on page load)
-		if (preview.src !== "" && preview.src !== null && preview.src.includes('data:image')) {
-			// Hide the "No image available" text if an image exists
-			noImageText.style.display = 'none';
-		} else {
-			// Show the fallback "No image available" text if there's no image preview
-			noImageText.style.display = 'block';
-		}
-	}
-</script>
+	</script>
+}

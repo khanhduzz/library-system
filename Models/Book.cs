@@ -18,7 +18,7 @@ namespace LibrarySystem.Models
         [Required]
         public string ISBN { get; set; } = string.Empty;
 
-        public DateTime PublishDate { get; set; }
+        public DateTime? PublishDate { get; set; }
         public ICollection<BookGenre> BookGenres { get; set; } = new List<BookGenre>();
 
         public bool IsAvailable { get; set; } = true;

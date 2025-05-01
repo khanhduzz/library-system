@@ -48,8 +48,11 @@ namespace LibrarySystem.Controllers
             }
 
             var book = await _context.Book
-                .Include(b => b.Author)
+                .Include(b => b.Author)            // Include the Author
+                .Include(b => b.BookGenres)        // Include the BookGenres
+                    .ThenInclude(bg => bg.Genre)   // Include the Genre associated with each BookGenre
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (book == null)
             {
                 return NotFound();
@@ -57,6 +60,7 @@ namespace LibrarySystem.Controllers
 
             return View(book);
         }
+
 
         // GET: Books/Create
         [Authorize(Roles = "Admin")]
