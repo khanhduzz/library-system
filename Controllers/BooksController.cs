@@ -24,7 +24,7 @@ namespace LibrarySystem.Controllers
         }
 
         // GET: Books
-        public async Task<IActionResult> Index(string? searchString, int page = 1, int pageSize = 2)
+        public async Task<IActionResult> Index(string? searchString, int page = 1, int pageSize = 4)
         {
             var booksQuery = _context.Book.Include(b => b.Author).AsQueryable();
 
@@ -150,6 +150,12 @@ namespace LibrarySystem.Controllers
                 return NotFound();
             }
 
+            // Check for duplicate ISBN (exclude current book)
+            if (await _context.Book.AnyAsync(b => b.ISBN == updatedBook.ISBN && b.Id != updatedBook.Id))
+            {
+                ModelState.AddModelError("ISBN", "ISBN already exists. Please enter a unique ISBN.");
+            }
+
             if (ModelState.IsValid)
             {
                 try
@@ -212,6 +218,7 @@ namespace LibrarySystem.Controllers
             ViewData["ConditionList"] = new SelectList(Enum.GetValues(typeof(BookCondition)), updatedBook.Condition);
             return View(updatedBook);
         }
+
 
         // GET: Books/Delete/5
         [Authorize(Roles = "Admin")]

@@ -7,7 +7,7 @@
 <div class="container mt-4 p-4 rounded shadow-sm" style="background-color: #f8f9fa;">
 	<h1 class="mb-4">Create New Book</h1>
 
-	<form asp-action="Create" enctype="multipart/form-data" method="post">
+	<form asp-action="Create" enctype="multipart/form-data" method="post" id="createBookForm">
 		<div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
 		<div class="row">
@@ -81,12 +81,13 @@
 					<select asp-for="Condition" class="form-select" asp-items="ViewBag.ConditionList">
 						<option value="">-- Select Condition --</option>
 					</select>
+					<span asp-validation-for="Condition" class="text-danger"></span>
 				</div>
 			</div>
 		</div>
 
 		<div class="d-flex gap-2 pt-3 mt-auto">
-			<button type="submit" class="btn btn-primary">Create</button>
+			<button id="saveButton" type="submit" class="btn btn-primary">Create</button>
 			<a asp-action="Index" class="btn btn-secondary">Back to List</a>
 		</div>
 	</form>
@@ -96,49 +97,4 @@
 	@{
 		await Html.RenderPartialAsync("_ValidationScriptsPartial");
 	}
-
-	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-	<script>
-		@if (!ViewData.ModelState.IsValid && ViewData.ModelState.ContainsKey("ISBN"))
-		{
-			<text>
-							Swal.fire({
-								icon: 'error',
-								title: 'Duplicate ISBN',
-								text: '@ViewData.ModelState["ISBN"]?.Errors.FirstOrDefault()?.ErrorMessage',
-								width: '400px',
-								padding: '1.5rem',
-								confirmButtonColor: '#0d6efd',
-								confirmButtonText: 'OK',
-								customClass: {
-									popup: 'shadow rounded',
-									title: 'fs-4',
-									confirmButton: 'btn btn-primary'
-								}
-							});
-			</text>
-		}
-	</script>
-
-	<script>
-		function previewImage(event) {
-			const file = event.target.files[0];
-			const preview = document.getElementById('ImagePreview');
-			const noImageText = document.getElementById('NoImageText');
-
-			if (file) {
-				const reader = new FileReader();
-				reader.onload = function (e) {
-					preview.src = e.target.result;
-					preview.style.display = 'block';
-					noImageText.style.display = 'none';
-				};
-				reader.readAsDataURL(file);
-			} else {
-				preview.style.display = 'none';
-				noImageText.style.display = 'block';
-			}
-		}
-	</script>
 }
