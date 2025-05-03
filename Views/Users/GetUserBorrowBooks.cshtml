@@ -1,0 +1,41 @@
+﻿@model LibrarySystem.Models.UserInformationViewModel
+
+<div>
+    <h2>@Model.User.Name's Borrowed Books</h2>
+
+    @if (Model.BorrowedBooks.Any())
+    {
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Book Title</th>
+                    <th>Borrow Date</th>
+                    <th>Return Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var borrowedBook in Model.BorrowedBooks)
+                {
+                    <tr>
+                        <td>@borrowedBook.Book.Title</td>
+                        <td>@borrowedBook.BorrowDate.ToShortDateString()</td>
+                        <td>
+                            @if (borrowedBook.ReturnDate.HasValue)
+                            {
+                                @borrowedBook.ReturnDate.Value.ToShortDateString()
+                            }
+                            else
+                            {
+                                <span>Not Returned</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <p>@Model.User.Name has not borrowed any books.</p>
+    }
+</div>

@@ -24,5 +24,6 @@
     <div class="mt-4 d-flex gap-2">
         <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-primary">Edit</a>
         <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+        <a asp-controller="Users" asp-action="GetUserBorrowBooks" asp-route-id="@Model?.Id">View Borrowed Books</a>
     </div>
 </div>

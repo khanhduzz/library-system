@@ -165,5 +165,34 @@ namespace LibrarySystem.Controllers
         {
             return _context.User.Any(e => e.Id == id);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetUserBorrowBooks (int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var user = await _context.User
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var borrowBooks = await _context.BorrowedBook
+                .Where(m => m.UserId == id)
+                .Include(m => m.Book)
+                .ToListAsync();
+
+            var model = new UserInformationViewModel
+            {
+                User = user,
+                BorrowedBooks = borrowBooks
+            };
+
+            return View(model);
+        }
     }
 }
