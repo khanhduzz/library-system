@@ -16,3 +16,13 @@
 		noImageText.style.display = 'block';
 	}
 }
+
+$('#deleteModal').on('show.bs.modal', function (event) {
+	var button = $(event.relatedTarget);
+	var bookId = button.data('id');
+	var bookTitle = button.data('title');
+
+	var modal = $(this);
+	modal.find('#modalBookTitle').text(bookTitle);
+	modal.find('#deleteForm').attr('action', '/Books/Delete/' + bookId);
+});

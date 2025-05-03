@@ -90,4 +90,12 @@ a {
     text-overflow: ellipsis;
 }
 
+.wrap-text {
+    width: auto;
+    height: 4.5em;
+    overflow: auto;
+    white-space: normal;
+    word-wrap: break-word;
+}
+
 

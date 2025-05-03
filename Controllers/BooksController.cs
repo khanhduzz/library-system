@@ -25,7 +25,7 @@ namespace LibrarySystem.Controllers
         }
 
         // GET: Books
-        public async Task<IActionResult> Index(string? searchString, int page = 1, int pageSize = 4)
+        public async Task<IActionResult> Index(string? searchString, int page = 1, int pageSize = 5)
         {
             var booksQuery = _context.Book.Include(b => b.Author).AsQueryable();
 

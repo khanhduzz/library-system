@@ -5,20 +5,9 @@
 	ViewData["Title"] = "Index";
 }
 
-<style>
-	.wrap-text {
-		max-width: 150px;
-		max-height: 4.5em;
-		overflow: auto;
-		white-space: normal;
-		word-wrap: break-word;
-	}
-</style>
-
-
-<div class="d-flex flex-column" style="min-height: 90vh">
+<div class="d-flex flex-column mt-2" style="height: 90vh">
 	<!-- Content container -->
-	<div class="container mt-4 p-4 rounded shadow-sm flex-grow-1" style="background-color: #f8f9fa;">
+	<div class="container px-4 rounded shadow-sm" style="background-color: #f8f9fa; height: 100%">
 		<h1 class="mb-4">Books</h1>
 
 		<div class="row mb-3">
@@ -35,27 +24,27 @@
 			</div>
 		</div>
 
-		<table class="table table-bordered table-striped table-responsive small align-middle">
-			<thead class="thead-dark text-center">
+		<table class="table table-bordered table-striped table-responsive small align-middle" style="table-layout: fixed;">
+			<thead class="thead-dark text-center align-middle">
 				<tr>
 					<th style="width: 15%;">@Html.DisplayNameFor(model => model.First().Title)</th>
 					<th style="width: 20%;">@Html.DisplayNameFor(model => model.First().Description)</th>
-					<th style="width: 10%;">@Html.DisplayNameFor(model => model.First().Author)</th>
+					<th style="width: 9%;">@Html.DisplayNameFor(model => model.First().Author)</th>
 					<th style="width: 10%;">ISBN</th>
-					<th style="width: 10%;">Publish Date</th>
-					<th style="width: 5%;">Condition</th>
-					<th style="width: 5%;">Available</th>
-					<th class="text-center" style="width: 25%;">Actions</th>
+					<th style="width: 9%;">Publish Date</th>
+					<th style="width: 7%;">Condition</th>
+					<th style="width: 7%;">Available</th>
+					<th class="text-center" style="width: 23%;">Actions</th>
 				</tr>
 			</thead>
 			<tbody>
 				@foreach (var item in Model)
 				{
 					<tr class="text-center">
-						<td class="text-truncate wrap-text">@Html.Truncate(item.Title)</td>
+						<td class="text-truncate wrap-text text-start ps-3" style="font-weight: bold;">@Html.Truncate(item.Title)</td>
 						<td class="text-truncate text-start wrap-text">@Html.Truncate(item.Description)</td>
 						<td class="text-truncate wrap-text">@Html.Truncate(item.Author?.Name)</td>
-						<td class="text-truncate wrap-text">@Html.Truncate(item.ISBN)</td>
+						<td class="text-truncate wrap-text" style="font-size: 10px; font-weight: bold;">@Html.Truncate(item.ISBN)</td>
 						<td>@item.PublishDate?.ToString("yyyy-MM-dd")</td>
 						<td>@item.Condition</td>
 						<td>@(item.IsAvailable ? "Yes" : "No")</td>
@@ -82,7 +71,7 @@
 	</div>
 
 	<!-- Pagination Section -->
-	<nav aria-label="Page navigation" class="mt-4">
+	<nav aria-label="Page navigation" class="mt-2">
 		<ul class="pagination justify-content-center">
 			@if (Model.HasPreviousPage && Model.PageIndex > 2 && Model.TotalPages > 5)
 			{
@@ -130,8 +119,6 @@
 			}
 		</ul>
 	</nav>
-
-
 </div>
 
 <!-- Admin-only Delete Modal -->
@@ -156,20 +143,3 @@
 		</div>
 	</div>
 </admin-only>
-
-@section Scripts {
-	@if (User.IsInRole("Admin"))
-	{
-		<script>
-			$('#deleteModal').on('show.bs.modal', function (event) {
-				var button = $(event.relatedTarget);
-				var bookId = button.data('id');
-				var bookTitle = button.data('title');
-
-				var modal = $(this);
-				modal.find('#modalBookTitle').text(bookTitle);
-				modal.find('#deleteForm').attr('action', '/Books/Delete/' + bookId);
-			});
-		</script>
-	}
-}
