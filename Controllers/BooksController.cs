@@ -10,6 +10,7 @@ using LibrarySystem.Models;
 using Microsoft.AspNetCore.Authorization;
 using LibrarySystem.Helpers;
 using LibrarySystem.Enums;
+using System.Security.Claims;
 
 namespace LibrarySystem.Controllers
 {
@@ -39,27 +40,29 @@ namespace LibrarySystem.Controllers
         }
 
         // GET: Books/Details/5
-        [AllowAnonymous]
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
             var book = await _context.Book
-                .Include(b => b.Author)            // Include the Author
-                .Include(b => b.BookGenres)        // Include the BookGenres
-                    .ThenInclude(bg => bg.Genre)   // Include the Genre associated with each BookGenre
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .FirstOrDefaultAsync(b => b.Id == id);
 
             if (book == null)
             {
                 return NotFound();
             }
 
-            return View(book);
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var borrowedBook = await _context.BorrowedBook
+                .FirstOrDefaultAsync(b => b.UserId == userId && b.BookId == id && b.ReturnDate == null);
+
+            var viewModel = new BookDetailsViewModel
+            {
+                Book = book,
+                IsBorrowedByUser = borrowedBook != null
+            };
+
+            return View(viewModel);
         }
+
 
 
         // GET: Books/Create
@@ -259,6 +262,131 @@ namespace LibrarySystem.Controllers
         private bool BookExists(int id)
         {
             return _context.Book.Any(e => e.Id == id);
+        }
+
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> Borrow(int bookId)
+        {
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));  // Get the logged-in user ID
+
+            // Check if the user has already borrowed this book and hasn't returned it yet
+            var existingBorrowedBook = await _context.BorrowedBook
+                .FirstOrDefaultAsync(b => b.UserId == userId && b.BookId == bookId && b.ReturnDate == null);
+
+            if (existingBorrowedBook != null)
+            {
+                TempData["Error"] = "You have already borrowed this book and haven't returned it yet.";
+                return RedirectToAction("Details", new { id = bookId });
+            }
+
+            // Fetch the book from the database
+            var book = await _context.Book.FirstOrDefaultAsync(b => b.Id == bookId);
+            if (book == null)
+            {
+                TempData["Error"] = "Book not found.";
+                return RedirectToAction("Details", new { id = bookId });
+            }
+
+            // Check if there are available copies in the inventory
+            var inventory = await _context.Inventory.FirstOrDefaultAsync(i => i.BookId == book.Id);
+            if (inventory == null || inventory.AvailableCopies <= 0)
+            {
+                TempData["Error"] = "No copies available to borrow.";
+                return RedirectToAction("Details", new { id = bookId });
+            }
+
+            // Proceed to borrow the book if all checks pass
+            await BorrowBookAsync(bookId);
+            TempData["Success"] = "You have successfully borrowed the book!";
+            return RedirectToAction("Details", new { id = bookId });
+        }
+
+
+
+        // Return Book Action
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> Return(int bookId)
+        {
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));  // Get the logged-in user ID
+
+            // Fetch the book
+            var book = await _context.Book.FirstOrDefaultAsync(b => b.Id == bookId);
+            if (book == null)
+            {
+                TempData["Error"] = "Book not found.";
+                return RedirectToAction("Details", new { id = bookId });
+            }
+
+            // Find the user's borrowed book record that hasn't been returned yet
+            var borrowedBook = await _context.BorrowedBook
+                .FirstOrDefaultAsync(b => b.UserId == userId && b.BookId == book.Id && b.ReturnDate == null);
+
+            if (borrowedBook == null)
+            {
+                TempData["Error"] = "This book was not borrowed or is already returned.";
+                return RedirectToAction("Details", new { id = bookId });
+            }
+
+            // Mark the book as returned
+            await ReturnBookAsync(userId, book.Id);
+            TempData["Success"] = "You have successfully returned the book!";
+            return RedirectToAction("Details", new { id = bookId });
+        }
+
+        public async Task ReturnBookAsync(int userId, int bookId)
+        {
+            // Find the borrowed book entry
+            var borrowedBook = await _context.BorrowedBook
+                                              .FirstOrDefaultAsync(b => b.UserId == userId && b.BookId == bookId && b.ReturnDate == null);
+
+            if (borrowedBook == null)
+            {
+                throw new InvalidOperationException("This book was not borrowed or already returned.");
+            }
+
+            // Mark as returned
+            borrowedBook.ReturnDate = DateTime.UtcNow;
+
+            var inventory = await _context.Inventory
+                                          .FirstOrDefaultAsync(i => i.BookId == bookId);
+
+            if (inventory != null)
+            {
+                inventory.AvailableCopies += 1;  // Return the book to inventory
+            }
+
+            await _context.SaveChangesAsync();
+        }
+
+
+
+        public async Task BorrowBookAsync(int bookId)
+        {
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));  // Get the logged-in user ID
+            var inventory = await _context.Inventory
+                                          .FirstOrDefaultAsync(i => i.BookId == bookId);
+
+            if (inventory == null || inventory.AvailableCopies <= 0)
+            {
+                throw new InvalidOperationException("No copies available to borrow.");
+            }
+
+            // Create a new BorrowedBook entry
+            var borrowedBook = new BorrowedBook
+            {
+                UserId = userId,
+                BookId = bookId,
+                BorrowDate = DateTime.UtcNow,
+                Status = "Borrowed"
+            };
+
+            // Update inventory to reduce available copies
+            inventory.AvailableCopies -= 1;
+
+            _context.BorrowedBook.Add(borrowedBook);
+            await _context.SaveChangesAsync();
         }
     }
 }

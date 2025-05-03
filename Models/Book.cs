@@ -32,5 +32,8 @@ namespace LibrarySystem.Models
         public int BorrowCount { get; set; } = 0;
 
         public BookCondition Condition { get; set; } = BookCondition.New;
+        public int TotalCopies { get; set; } = 0;
+        public ICollection<BorrowedBook> BorrowedBooks { get; set; } = new List<BorrowedBook>();
+
     }
 }

@@ -14,5 +14,6 @@ namespace LibrarySystem.Models
         [Required]
         public string UserName { get; set; } = string.Empty;
         public ICollection<Role> Roles { get; set; } = new List<Role>();
+        public ICollection<BorrowedBook> BorrowedBooks { get; set; } = new List<BorrowedBook>();
     }
 }

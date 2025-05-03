@@ -58,6 +58,9 @@
 								<a class="nav-link text-dark" asp-area="" asp-controller="Genres" asp-action="Index">Genres</a>
 							</li>
 							<li class="nav-item">
+								<a class="nav-link text-dark" asp-area="" asp-controller="Inventories" asp-action="Index">Inventories</a>
+							</li>
+							<li class="nav-item">
 								<span class="nav-link text-dark">Hello, @User.Identity.Name!</span>
 							</li>
 							<li class="nav-item">
@@ -80,6 +83,20 @@
 
 	<div class="container">
 		<main role="main" class="pb-3">
+			<!-- Error and Success Messages -->
+			@if (TempData["Error"] != null)
+			{
+				<div class="alert alert-danger">
+					@TempData["Error"]
+				</div>
+			}
+
+			@if (TempData["Success"] != null)
+			{
+				<div class="alert alert-success">
+					@TempData["Success"]
+				</div>
+			}
 			@RenderBody()
 		</main>
 	</div>

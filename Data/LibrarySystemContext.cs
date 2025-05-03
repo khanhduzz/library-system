@@ -9,7 +9,7 @@ namespace LibrarySystem.Data
 {
     public class LibrarySystemContext : DbContext
     {
-        public LibrarySystemContext (DbContextOptions<LibrarySystemContext> options)
+        public LibrarySystemContext(DbContextOptions<LibrarySystemContext> options)
             : base(options)
         {
         }
@@ -17,16 +17,18 @@ namespace LibrarySystem.Data
         public DbSet<LibrarySystem.Models.Book> Book { get; set; } = default!;
         public DbSet<LibrarySystem.Models.Author> Author { get; set; } = default!;
         public DbSet<LibrarySystem.Models.User> User { get; set; } = default!;
+        public DbSet<LibrarySystem.Models.Inventory> Inventory { get; set; } = default!;
         public DbSet<LibrarySystem.Models.Role> Role { get; set; } = default!;
         public DbSet<Genre> Genre { get; set; } = default!;
-        public DbSet<BookGenre> BookGenre { get; set; } = default!; // <-- ADD THIS
+        public DbSet<BookGenre> BookGenre { get; set; } = default!;
+        public DbSet<BorrowedBook> BorrowedBook { get; set; } = default!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<BookGenre>()
-                .HasKey(bg => new { bg.BookId, bg.GenreId }); // <-- Define composite primary key
+                .HasKey(bg => new { bg.BookId, bg.GenreId });
 
             modelBuilder.Entity<BookGenre>()
                 .HasOne(bg => bg.Book)
@@ -37,6 +39,21 @@ namespace LibrarySystem.Data
                 .HasOne(bg => bg.Genre)
                 .WithMany(g => g.BookGenres)
                 .HasForeignKey(bg => bg.GenreId);
+
+            modelBuilder.Entity<BorrowedBook>()
+                .HasKey(bb => new { bb.Id });
+
+            modelBuilder.Entity<BorrowedBook>()
+                .HasOne(bb => bb.User)
+                .WithMany(u => u.BorrowedBooks)
+                .HasForeignKey(bb => bb.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<BorrowedBook>()
+                .HasOne(bb => bb.Book)
+                .WithMany(b => b.BorrowedBooks)
+                .HasForeignKey(bb => bb.BookId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

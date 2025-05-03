@@ -1,4 +1,4 @@
-﻿@model LibrarySystem.Models.Book
+﻿@model LibrarySystem.Models.BookDetailsViewModel
 
 @{
     ViewData["Title"] = "Book Details";
@@ -13,36 +13,36 @@
             <div>
                 <dl class="row">
                     <dt class="col-sm-4">
-                        @Html.DisplayNameFor(model => model.Title)
+                        @Html.DisplayNameFor(model => model.Book.Title)
                     </dt>
                     <dd class="col-sm-8">
-                        @Html.DisplayFor(model => model.Title)
+                        @Html.DisplayFor(model => model.Book.Title)
                     </dd>
 
                     <dt class="col-sm-4">
-                        @Html.DisplayNameFor(model => model.Description)
+                        @Html.DisplayNameFor(model => model.Book.Description)
                     </dt>
                     <dd class="col-sm-8">
-                        @Html.DisplayFor(model => model.Description)
+                        @Html.DisplayFor(model => model.Book.Description)
                     </dd>
 
                     <dt class="col-sm-4">
                         Author
                     </dt>
                     <dd class="col-sm-8">
-                        @Model.Author?.Name
+                        @Model.Book.Author?.Name
                     </dd>
 
                     <dt class="col-sm-4">
                         Genres
                     </dt>
                     <dd class="col-sm-8">
-                        @if (Model.BookGenres.Any())
+                        @if (Model.Book.BookGenres.Any())
                         {
-                            @foreach (var genre in Model.BookGenres)
+                            @foreach (var genre in Model.Book.BookGenres)
                             {
                                 <span>@genre.Genre.Name</span>
-                                @if (!ReferenceEquals(genre, Model.BookGenres.Last()))
+                                @if (!ReferenceEquals(genre, Model.Book.BookGenres.Last()))
                                 {
                                     <span>, </span> <!-- Add comma if it's not the last genre -->
                                 }
@@ -55,54 +55,75 @@
                     </dd>
 
                     <dt class="col-sm-4">
-                        @Html.DisplayNameFor(model => model.ISBN)
+                        @Html.DisplayNameFor(model => model.Book.ISBN)
                     </dt>
                     <dd class="col-sm-8">
-                        @Html.DisplayFor(model => model.ISBN)
+                        @Html.DisplayFor(model => model.Book.ISBN)
                     </dd>
 
                     <dt class="col-sm-4">
-                        @Html.DisplayNameFor(model => model.PublishDate)
+                        @Html.DisplayNameFor(model => model.Book.PublishDate)
                     </dt>
                     <dd class="col-sm-8">
-                        @Model.PublishDate?.ToString("yyyy-MM-dd")
+                        @Model.Book.PublishDate?.ToString("yyyy-MM-dd")
                     </dd>
 
                     <dt class="col-sm-4">
                         Available for Rent
                     </dt>
                     <dd class="col-sm-8">
-                        @(Model.IsAvailable ? "Yes" : "No")
+                        @(Model.Book.IsAvailable ? "Yes" : "No")
                     </dd>
 
                     <dt class="col-sm-4">
-                        @Html.DisplayNameFor(model => model.Condition)
+                        @Html.DisplayNameFor(model => model.Book.Condition)
                     </dt>
                     <dd class="col-sm-8">
-                        @Model.Condition.ToString()
+                        @Model.Book.Condition.ToString()
                     </dd>
 
                     <dt class="col-sm-4">
                         Borrow Count
                     </dt>
                     <dd class="col-sm-8">
-                        @Model.BorrowCount
+                        @Model.Book.BorrowCount
                     </dd>
                 </dl>
             </div>
 
             <!-- Buttons at the very bottom -->
             <div class="d-flex gap-2 pt-3">
-                <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-primary">Edit</a>
+                <a asp-action="Edit" asp-route-id="@Model?.Book.Id" class="btn btn-primary">Edit</a>
+                @if (User.Identity.IsAuthenticated)
+                {
+                    @if (Model.IsBorrowedByUser)
+                    {
+                        <form method="post" asp-action="Return" asp-controller="Books">
+                            <input type="hidden" name="bookId" value="@Model.Book.Id" />
+                            <button type="submit" class="btn btn-warning">Return</button>
+                        </form>
+                    }
+                    else if (Model.Book.IsAvailable)
+                    {
+                        <form method="post" asp-action="Borrow" asp-controller="Books">
+                            <input type="hidden" name="bookId" value="@Model.Book.Id" />
+                            <button type="submit" class="btn btn-danger">Borrow</button>
+                        </form>
+                    }
+                    else
+                    {
+                        <span class="text-muted">Not available</span>
+                    }
+                }
                 <a asp-action="Index" class="btn btn-secondary">Back to List</a>
             </div>
         </div>
 
         <!-- Right Side: Image Display -->
         <div class="col-md-5 d-flex align-items-center justify-content-center">
-            @if (Model.Image != null)
+            @if (Model.Book.Image != null)
             {
-                <img src="data:image/jpeg;base64,@Convert.ToBase64String(Model.Image)"
+                <img src="data:image/jpeg;base64,@Convert.ToBase64String(Model.Book.Image)"
                      class="rounded shadow img-fluid"
                      style="height: 400px; width: auto;" />
             }

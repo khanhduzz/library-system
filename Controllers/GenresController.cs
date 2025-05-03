@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using LibrarySystem.Data;
 using LibrarySystem.Models;
 
-namespace LibrarySystem
+namespace LibrarySystem.Controllers
 {
     public class GenresController : Controller
     {
