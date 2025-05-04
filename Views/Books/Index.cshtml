@@ -69,56 +69,12 @@
 		</table>
 
 	</div>
-
-	<!-- Pagination Section -->
-	<nav aria-label="Page navigation" class="mt-2">
-		<ul class="pagination justify-content-center">
-			@if (Model.HasPreviousPage && Model.PageIndex > 2 && Model.TotalPages > 5)
-			{
-				<li class="page-item">
-					<a class="page-link" asp-action="Index" asp-route-page="1" asp-route-searchString="@Model.SearchString">1</a>
-				</li>
-			}
-			@if (Model.HasPreviousPage)
-			{
-				<li class="page-item">
-					<a class="page-link" asp-action="Index" asp-route-page="@(Model.PageIndex - 1)" asp-route-searchString="@Model.SearchString">&laquo;</a> <!-- << -->
-				</li>
-			}
-
-			@for (int i = 1; i <= Model.TotalPages; i++)
-			{
-				// Only show few surrounding pages
-				if (Model.TotalPages <= 5 || (i >= Model.PageIndex - 1 && i <= Model.PageIndex + 1))
-				{
-					<li class="page-item @(i == Model.PageIndex ? "active" : "")">
-						<a class="page-link" asp-action="Index" asp-route-page="@i" asp-route-searchString="@Model.SearchString">@i</a>
-					</li>
-				}
-				else if (i == 2 && Model.PageIndex > 4)
-				{
-					<li class="page-item disabled"><span class="page-link">...</span></li>
-				}
-				else if (i == Model.TotalPages - 1 && Model.PageIndex < Model.TotalPages - 3)
-				{
-					<li class="page-item disabled"><span class="page-link">...</span></li>
-				}
-			}
-
-			@if (Model.HasNextPage)
-			{
-				<li class="page-item">
-					<a class="page-link" asp-action="Index" asp-route-page="@(Model.PageIndex + 1)" asp-route-searchString="@Model.SearchString">&raquo;</a> <!-- >> -->
-				</li>
-			}
-			@if (Model.HasNextPage && Model.PageIndex < Model.TotalPages - 1 && Model.TotalPages > 5)
-			{
-				<li class="page-item">
-					<a class="page-link" asp-action="Index" asp-route-page="@Model.TotalPages" asp-route-searchString="@Model.SearchString">@Model.TotalPages</a>
-				</li>
-			}
-		</ul>
-	</nav>
+	@await Html.PartialAsync("Pagination", new PaginationViewModel
+	{
+		PageIndex = Model.PageIndex,
+		TotalPages = Model.TotalPages,
+		SearchString = Model.SearchString
+	})
 </div>
 
 <!-- Admin-only Delete Modal -->
