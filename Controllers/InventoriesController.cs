@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using LibrarySystem.Data;
 using LibrarySystem.Models;
+using LibrarySystem.Enums;
 
 namespace LibrarySystem.Controllers
 {
@@ -49,6 +50,7 @@ namespace LibrarySystem.Controllers
         public IActionResult Create()
         {
             ViewData["BookId"] = new SelectList(_context.Book, "Id", "ISBN");
+            ViewData["Condition"] = new SelectList(Enum.GetValues(typeof(BookCondition)));
             return View();
         }
 
@@ -57,7 +59,7 @@ namespace LibrarySystem.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,BookId,AvailableCopies")] Inventory inventory)
+        public async Task<IActionResult> Create([Bind("Id,BookId,TotalCopies,AvailableCopies,Condition")] Inventory inventory)
         {
             if (ModelState.IsValid)
             {
@@ -66,6 +68,7 @@ namespace LibrarySystem.Controllers
                 return RedirectToAction(nameof(Index));
             }
             ViewData["BookId"] = new SelectList(_context.Book, "Id", "ISBN", inventory.BookId);
+            ViewData["Condition"] = new SelectList(Enum.GetValues(typeof(BookCondition)));
             return View(inventory);
         }
 
@@ -83,6 +86,7 @@ namespace LibrarySystem.Controllers
                 return NotFound();
             }
             ViewData["BookId"] = new SelectList(_context.Book, "Id", "ISBN", inventory.BookId);
+            ViewData["Condition"] = new SelectList(Enum.GetValues(typeof(BookCondition)), inventory.Condition);
             return View(inventory);
         }
 
@@ -91,7 +95,7 @@ namespace LibrarySystem.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,BookId,AvailableCopies")] Inventory inventory)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,BookId,TotalCopies,AvailableCopies,Condition")] Inventory inventory)
         {
             if (id != inventory.Id)
             {
@@ -119,6 +123,7 @@ namespace LibrarySystem.Controllers
                 return RedirectToAction(nameof(Index));
             }
             ViewData["BookId"] = new SelectList(_context.Book, "Id", "ISBN", inventory.BookId);
+            ViewData["Condition"] = new SelectList(Enum.GetValues(typeof(BookCondition)), inventory.Condition);
             return View(inventory);
         }
 

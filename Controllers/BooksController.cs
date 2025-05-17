@@ -9,8 +9,8 @@ using LibrarySystem.Data;
 using LibrarySystem.Models;
 using Microsoft.AspNetCore.Authorization;
 using LibrarySystem.Helpers;
-using LibrarySystem.Enums;
 using System.Security.Claims;
+using System.Net;
 
 namespace LibrarySystem.Controllers
 {
@@ -51,37 +51,40 @@ namespace LibrarySystem.Controllers
             }
 
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-            var borrowedBook = await _context.BorrowedBook
-                .FirstOrDefaultAsync(b => b.UserId == userId && b.BookId == id && b.ReturnDate == null);
+            var inventory = await _context.Inventory
+                .FirstOrDefaultAsync(i => i.BookId == id);
+
+            // Then query BorrowedBook with the userId
+            //var borrowed;
+            //if (inventory != null)
+            //{
+            //    borrowed = await _context.BorrowedBook
+            //        .FirstOrDefaultAsync(b => b.InventoryId == inventory.Id && b.UserId == userId && b.ReturnDate == null);
+            //}
 
             var viewModel = new BookDetailsViewModel
             {
                 Book = book,
-                IsBorrowedByUser = borrowedBook != null
+                //IsBorrowedByUser = borrowed != null
             };
 
             return View(viewModel);
         }
-
-
 
         // GET: Books/Create
         [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             ViewData["AuthorId"] = new SelectList(_context.Set<Author>(), "Id", "Name");
-            ViewData["Genres"] = new MultiSelectList(_context.Genre, "Id", "Name"); // <-- new for genres
-            ViewData["ConditionList"] = new SelectList(Enum.GetValues(typeof(BookCondition)));
+            ViewData["Genres"] = new MultiSelectList(_context.Genre, "Id", "Name");
             return View();
         }
 
         // POST: Books/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Create([Bind("Title,Description,AuthorId,ISBN,PublishDate,IsAvailable,Condition")] Book book, IFormFile? ImageFile, List<int>? selectedGenres)
+        public async Task<IActionResult> Create([Bind("Title,Description,AuthorId,ISBN,PublishDate")] Book book, IFormFile? ImageFile, List<int>? selectedGenres)
         {
             if (await _context.Book.AnyAsync(b => b.ISBN == book.ISBN))
             {
@@ -111,10 +114,8 @@ namespace LibrarySystem.Controllers
 
             ViewData["AuthorId"] = new SelectList(_context.Set<Author>(), "Id", "Name", book?.AuthorId);
             ViewData["Genres"] = new MultiSelectList(_context.Genre, "Id", "Name", selectedGenres);
-            ViewData["ConditionList"] = new SelectList(Enum.GetValues(typeof(BookCondition)), book?.Condition);
             return View(book);
         }
-
 
         // GET: Books/Edit/5
         [Authorize(Roles = "Admin")]
@@ -136,24 +137,20 @@ namespace LibrarySystem.Controllers
 
             ViewData["AuthorId"] = new SelectList(_context.Set<Author>(), "Id", "Name", book.AuthorId);
             ViewData["Genres"] = new MultiSelectList(_context.Genre, "Id", "Name", book.BookGenres.Select(bg => bg.GenreId));
-            ViewData["ConditionList"] = new SelectList(Enum.GetValues(typeof(BookCondition)), book.Condition);
             return View(book);
         }
 
         // POST: Books/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Description,AuthorId,ISBN,PublishDate,IsAvailable,Condition")] Book updatedBook, IFormFile? ImageFile, List<int>? selectedGenres)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Description,AuthorId,ISBN,PublishDate")] Book updatedBook, IFormFile? ImageFile, List<int>? selectedGenres)
         {
             if (id != updatedBook.Id)
             {
                 return NotFound();
             }
 
-            // Check for duplicate ISBN (exclude current book)
             if (await _context.Book.AnyAsync(b => b.ISBN == updatedBook.ISBN && b.Id != updatedBook.Id))
             {
                 ModelState.AddModelError("ISBN", "ISBN already exists. Please enter a unique ISBN.");
@@ -177,8 +174,6 @@ namespace LibrarySystem.Controllers
                     book.AuthorId = updatedBook.AuthorId;
                     book.ISBN = updatedBook.ISBN;
                     book.PublishDate = updatedBook.PublishDate;
-                    book.IsAvailable = updatedBook.IsAvailable;
-                    book.Condition = updatedBook.Condition;
 
                     if (ImageFile != null && ImageFile.Length > 0)
                     {
@@ -189,7 +184,6 @@ namespace LibrarySystem.Controllers
                         }
                     }
 
-                    // Update genres
                     book.BookGenres.Clear();
                     if (selectedGenres != null)
                     {
@@ -218,10 +212,8 @@ namespace LibrarySystem.Controllers
 
             ViewData["AuthorId"] = new SelectList(_context.Set<Author>(), "Id", "Name", updatedBook.AuthorId);
             ViewData["Genres"] = new MultiSelectList(_context.Genre, "Id", "Name", selectedGenres);
-            ViewData["ConditionList"] = new SelectList(Enum.GetValues(typeof(BookCondition)), updatedBook.Condition);
             return View(updatedBook);
         }
-
 
         // GET: Books/Delete/5
         [Authorize(Roles = "Admin")]
@@ -268,19 +260,21 @@ namespace LibrarySystem.Controllers
         [Authorize]
         public async Task<IActionResult> Borrow(int bookId)
         {
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));  // Get the logged-in user ID
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
 
-            // Check if the user has already borrowed this book and hasn't returned it yet
-            var existingBorrowedBook = await _context.BorrowedBook
-                .FirstOrDefaultAsync(b => b.UserId == userId && b.BookId == bookId && b.ReturnDate == null);
+            var inventory = await _context.Inventory
+                            .FirstOrDefaultAsync(i => i.BookId == bookId);
 
-            if (existingBorrowedBook != null)
+            // Then query BorrowedBook with the userId
+            var borrowed = await _context.BorrowedBook
+                .FirstOrDefaultAsync(b => b.InventoryId == inventory.Id && b.UserId == userId && b.ReturnDate == null);
+
+            if (borrowed != null)
             {
                 TempData["Error"] = "You have already borrowed this book and haven't returned it yet.";
                 return RedirectToAction("Details", new { id = bookId });
             }
 
-            // Fetch the book from the database
             var book = await _context.Book.FirstOrDefaultAsync(b => b.Id == bookId);
             if (book == null)
             {
@@ -288,30 +282,24 @@ namespace LibrarySystem.Controllers
                 return RedirectToAction("Details", new { id = bookId });
             }
 
-            // Check if there are available copies in the inventory
-            var inventory = await _context.Inventory.FirstOrDefaultAsync(i => i.BookId == book.Id);
+            //var inventory = await _context.Inventory.FirstOrDefaultAsync(i => i.BookId == book.Id);
             if (inventory == null || inventory.AvailableCopies <= 0)
             {
                 TempData["Error"] = "No copies available to borrow.";
                 return RedirectToAction("Details", new { id = bookId });
             }
 
-            // Proceed to borrow the book if all checks pass
             await BorrowBookAsync(bookId);
             TempData["Success"] = "You have successfully borrowed the book!";
             return RedirectToAction("Details", new { id = bookId });
         }
 
-
-
-        // Return Book Action
         [HttpPost]
         [Authorize]
         public async Task<IActionResult> Return(int bookId)
         {
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));  // Get the logged-in user ID
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
 
-            // Fetch the book
             var book = await _context.Book.FirstOrDefaultAsync(b => b.Id == bookId);
             if (book == null)
             {
@@ -319,17 +307,19 @@ namespace LibrarySystem.Controllers
                 return RedirectToAction("Details", new { id = bookId });
             }
 
-            // Find the user's borrowed book record that hasn't been returned yet
-            var borrowedBook = await _context.BorrowedBook
-                .FirstOrDefaultAsync(b => b.UserId == userId && b.BookId == book.Id && b.ReturnDate == null);
+            var inventory = await _context.Inventory
+                            .FirstOrDefaultAsync(i => i.BookId == bookId);
 
-            if (borrowedBook == null)
+            // Then query BorrowedBook with the userId
+            var borrowed = await _context.BorrowedBook
+                .FirstOrDefaultAsync(b => b.InventoryId == inventory.Id && b.UserId == userId && b.ReturnDate != null);
+
+            if (borrowed == null)
             {
                 TempData["Error"] = "This book was not borrowed or is already returned.";
                 return RedirectToAction("Details", new { id = bookId });
             }
 
-            // Mark the book as returned
             await ReturnBookAsync(userId, book.Id);
             TempData["Success"] = "You have successfully returned the book!";
             return RedirectToAction("Details", new { id = bookId });
@@ -337,52 +327,48 @@ namespace LibrarySystem.Controllers
 
         public async Task ReturnBookAsync(int userId, int bookId)
         {
-            // Find the borrowed book entry
-            var borrowedBook = await _context.BorrowedBook
-                                              .FirstOrDefaultAsync(b => b.UserId == userId && b.BookId == bookId && b.ReturnDate == null);
+            var inventory = await _context.Inventory
+                .FirstOrDefaultAsync(i => i.BookId == bookId);
 
-            if (borrowedBook == null)
+            // Then query BorrowedBook with the userId
+            var borrowed = await _context.BorrowedBook
+                .FirstOrDefaultAsync(b => b.InventoryId == inventory.Id && b.UserId == userId && b.ReturnDate == null);
+
+            if (borrowed == null)
             {
                 throw new InvalidOperationException("This book was not borrowed or already returned.");
             }
 
-            // Mark as returned
-            borrowedBook.ReturnDate = DateTime.UtcNow;
-
-            var inventory = await _context.Inventory
-                                          .FirstOrDefaultAsync(i => i.BookId == bookId);
+            borrowed.ReturnDate = DateTime.UtcNow;
 
             if (inventory != null)
             {
-                inventory.AvailableCopies += 1;  // Return the book to inventory
+                inventory.AvailableCopies += 1;
             }
 
             await _context.SaveChangesAsync();
         }
 
-
-
         public async Task BorrowBookAsync(int bookId)
         {
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));  // Get the logged-in user ID
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
             var inventory = await _context.Inventory
-                                          .FirstOrDefaultAsync(i => i.BookId == bookId);
+                .FirstOrDefaultAsync(i => i.BookId == bookId);
 
             if (inventory == null || inventory.AvailableCopies <= 0)
             {
                 throw new InvalidOperationException("No copies available to borrow.");
             }
 
-            // Create a new BorrowedBook entry
             var borrowedBook = new BorrowedBook
             {
                 UserId = userId,
-                BookId = bookId,
+                InventoryId = inventory.Id,
                 BorrowDate = DateTime.UtcNow,
                 Status = "Borrowed"
             };
 
-            // Update inventory to reduce available copies
             inventory.AvailableCopies -= 1;
 
             _context.BorrowedBook.Add(borrowedBook);

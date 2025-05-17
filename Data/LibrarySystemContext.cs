@@ -40,20 +40,20 @@ namespace LibrarySystem.Data
                 .WithMany(g => g.BookGenres)
                 .HasForeignKey(bg => bg.GenreId);
 
-            modelBuilder.Entity<BorrowedBook>()
-                .HasKey(bb => new { bb.Id });
+            //modelBuilder.Entity<BorrowedBook>()
+            //    .HasKey(bb => new { bb.Id });
 
-            modelBuilder.Entity<BorrowedBook>()
-                .HasOne(bb => bb.User)
-                .WithMany(u => u.BorrowedBooks)
-                .HasForeignKey(bb => bb.UserId)
-                .OnDelete(DeleteBehavior.Restrict);
+            //modelBuilder.Entity<BorrowedBook>()
+            //    .HasOne(bb => bb.User)
+            //    .WithMany(u => u.BorrowedBooks)
+            //    .HasForeignKey(bb => bb.UserId)
+            //    .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<BorrowedBook>()
-                .HasOne(bb => bb.Book)
-                .WithMany(b => b.BorrowedBooks)
-                .HasForeignKey(bb => bb.BookId)
-                .OnDelete(DeleteBehavior.Restrict);
+            //modelBuilder.Entity<BorrowedBook>()
+            //    .HasOne(bb => bb.Book)
+            //    .WithMany(b => b.BorrowedBooks)
+            //    .HasForeignKey(bb => bb.BookId)
+            //    .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

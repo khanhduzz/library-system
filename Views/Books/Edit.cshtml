@@ -56,11 +56,11 @@
 					<span asp-validation-for="PublishDate" class="text-danger"></span>
 				</div>
 
-				<label class="form-label fw-bold">Available for rent</label>
+				@* <label class="form-label fw-bold">Available for rent</label>
 				<div class="mb-3 form-check">
 					<input asp-for="IsAvailable" type="checkbox" class="form-check-input" />
 					<label asp-for="IsAvailable" class="form-check-label">Is Available</label>
-				</div>
+				</div> *@
 			</div>
 
 			<div class="col-md-5 d-flex flex-column">
@@ -75,13 +75,13 @@
 					</select>
 				</div>
 
-				<div class="mb-3">
+				@* <div class="mb-3">
 					<label asp-for="Condition" class="form-label fw-bold">Condition</label>
 					<select asp-for="Condition" class="form-select" asp-items="ViewBag.ConditionList">
 						<option value="">-- Select Condition --</option>
 					</select>
 					<span asp-validation-for="Condition" class="text-danger"></span>
-				</div>
+				</div> *@
 			</div>
 		</div>
 

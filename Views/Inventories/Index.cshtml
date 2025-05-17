@@ -16,7 +16,13 @@
                 @Html.DisplayNameFor(model => model.Book)
             </th>
             <th>
+                @Html.DisplayNameFor(model => model.TotalCopies)
+            </th>
+            <th>
                 @Html.DisplayNameFor(model => model.AvailableCopies)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Condition)
             </th>
             <th></th>
         </tr>
@@ -28,7 +34,13 @@
                 @Html.DisplayFor(modelItem => item.Book.ISBN)
             </td>
             <td>
+                @Html.DisplayFor(modelItem => item.TotalCopies)
+            </td>
+            <td>
                 @Html.DisplayFor(modelItem => item.AvailableCopies)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Condition)
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |

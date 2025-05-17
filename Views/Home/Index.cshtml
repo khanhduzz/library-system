@@ -8,7 +8,7 @@
 	<h1 class="mb-4" style="font-size: 3vw;">Welcome to Library System</h1>
 
 	<h2 class="text-primary mb-3" style="font-size: 2.5vw;">Books</h2>
-	<div class="d-flex flex-wrap justify-content-around">
+	<div class="d-flex flex-wrap justify-content-center">
 		@foreach (var book in Model.Books)
 		{
 			<div class="card-item">
@@ -17,7 +17,17 @@
 						<div class="card-body d-flex flex-column align-items-center gap-0">
 							@if (book.Image != null)
 							{
-								<img src="data:image/jpeg;base64,@Convert.ToBase64String(book.Image)" alt="Book Image" class="img-thumbnail" style="width: 100%; height: 20rem; object-fit: cover;" />
+								<img src="data:image/jpeg;base64,@Convert.ToBase64String(book.Image)"
+									 alt="Book Image"
+									 class="img-thumbnail"
+									 style="width: 100%; height: 20rem; object-fit: cover;" />
+							}
+							else
+							{
+								<img src="/images/default-book-3.png"
+									 alt="No Image Available"
+									 class="img-thumbnail"
+									 style="width: 100%; height: 250px; object-fit: cover;" />
 							}
 							<h5 class="card-title" style="font-size: 1.5vw;">@book.Title</h5>
 							<p class="card-text" style="font-size: 1vw;">@book.Description</p>

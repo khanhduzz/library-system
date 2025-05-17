@@ -32,8 +32,8 @@
 					<th style="width: 9%;">@Html.DisplayNameFor(model => model.First().Author)</th>
 					<th style="width: 10%;">ISBN</th>
 					<th style="width: 9%;">Publish Date</th>
-					<th style="width: 7%;">Condition</th>
-					<th style="width: 7%;">Available</th>
+					@* <th style="width: 7%;">Condition</th>
+					<th style="width: 7%;">Available</th> *@
 					<th class="text-center" style="width: 23%;">Actions</th>
 				</tr>
 			</thead>
@@ -46,8 +46,8 @@
 						<td class="text-truncate wrap-text">@Html.Truncate(item.Author?.Name)</td>
 						<td class="text-truncate wrap-text" style="font-size: 10px; font-weight: bold;">@Html.Truncate(item.ISBN)</td>
 						<td>@item.PublishDate?.ToString("yyyy-MM-dd")</td>
-						<td>@item.Condition</td>
-						<td>@(item.IsAvailable ? "Yes" : "No")</td>
+						@* <td>@item.Condition</td>
+						<td>@(item.IsAvailable ? "Yes" : "No")</td> *@
 						<td class="text-center" style="height: 100%;">
 							<div class="d-flex justify-content-center align-items-center gap-2 h-100">
 							<a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info btn-sm text-white">

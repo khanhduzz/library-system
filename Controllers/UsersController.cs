@@ -183,7 +183,7 @@ namespace LibrarySystem.Controllers
 
             var borrowBooks = await _context.BorrowedBook
                 .Where(m => m.UserId == id)
-                .Include(m => m.Book)
+                //.Include(m => m.Book)
                 .ToListAsync();
 
             var model = new UserInformationViewModel
