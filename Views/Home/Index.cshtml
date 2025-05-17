@@ -1,102 +1,112 @@
 ﻿@model LibrarySystem.Generic.HomeViewModel
 
 @{
-    ViewData["Title"] = "Home Page";
+	ViewData["Title"] = "Home Page";
 }
 
 <div class="container mt-5">
-    <h1 class="mb-4" style="font-size: 3vw;">Welcome to Library System</h1>
+	<h1 class="mb-4" style="font-size: 3vw;">Welcome to Library System</h1>
 
-    <h2 class="text-primary mb-3" style="font-size: 2.5vw;">Books</h2>
-    <div class="d-flex flex-wrap justify-content-around">
-        @foreach (var book in Model.Books)
-        {
-            <div class="card-item">
-                <a href="@Url.Action("Details", "Books", new { id = book.Id })" class="card-link">
-                    <div class="card h-100 border-primary">
-                        <div class="card-body d-flex flex-column align-items-center gap-0">
-                            @if (book.Image != null)
-                            {
-                                <img src="data:image/jpeg;base64,@Convert.ToBase64String(book.Image)" alt="Book Image" class="img-thumbnail" style="width: 100%; height: 20rem; object-fit: cover;" />
-                            }
-                            <h5 class="card-title" style="font-size: 1.5vw;">@book.Title</h5>
-                            <p class="card-text" style="font-size: 1vw;">@book.Description</p>
-                            <p class="card-text" style="font-size: 0.9vw;">
-                                <small class="text-muted">Author: @book.Author?.Name</small>
-                            </p>
-                        </div>
-                    </div>
-                </a>
-            </div>
-        }
-    </div>
+	<h2 class="text-primary mb-3" style="font-size: 2.5vw;">Books</h2>
+	<div class="d-flex flex-wrap justify-content-around">
+		@foreach (var book in Model.Books)
+		{
+			<div class="card-item">
+				<a href="@Url.Action("Details", "Books", new { id = book.Id })" class="card-link">
+					<div class="card h-100 border-primary">
+						<div class="card-body d-flex flex-column align-items-center gap-0">
+							@if (book.Image != null)
+							{
+								<img src="data:image/jpeg;base64,@Convert.ToBase64String(book.Image)" alt="Book Image" class="img-thumbnail" style="width: 100%; height: 20rem; object-fit: cover;" />
+							}
+							<h5 class="card-title" style="font-size: 1.5vw;">@book.Title</h5>
+							<p class="card-text" style="font-size: 1vw;">@book.Description</p>
+							<p class="card-text" style="font-size: 0.9vw;">
+								<small class="text-muted">Author: @book.Author?.Name</small>
+							</p>
+						</div>
+					</div>
+				</a>
+			</div>
+		}
+	</div>
 
-    <h2 class="text-primary mt-5 mb-3" style="font-size: 2.5vw;">Authors</h2>
-    <div class="d-flex flex-wrap justify-content-between">
-        @foreach (var author in Model.Authors)
-        {
-            <div class="card-item">
-                <a href="@Url.Action("Details", "Authors", new { id = author.Id })" class="card-link">
-                    <div class="card h-100 border-secondary">
-                        <div class="card-body d-flex flex-column align-items-center gap-0">
-                            @if (author.Image != null)
-                            {
-                                <img src="data:image/jpeg;base64,@Convert.ToBase64String(author.Image)" alt="Author Image" class="img-thumbnail" style="width: 100%; height: 250px; object-fit: cover;" />
-                            }
-                            <h5 class="card-title" style="font-size: 1.5vw;">@author.Name</h5>
-                            <p class="card-text text-center" style="font-size: 1vw;">@author.Description</p>
-                        </div>
-                    </div>
-                </a>
-            </div>
-        }
-    </div>
+	<h2 class="text-primary mt-5 mb-3" style="font-size: 2.5vw;">Authors</h2>
+	<div class="d-flex flex-wrap justify-content-center">
+		@foreach (var author in Model.Authors)
+		{
+			<div class="card-item">
+				<a href="@Url.Action("Details", "Authors", new { id = author.Id })" class="card-link">
+					<div class="card h-100 border-secondary">
+						<div class="card-body d-flex flex-column align-items-center gap-0">
+							@if (author.Image != null)
+							{
+								<img src="data:image/jpeg;base64,@Convert.ToBase64String(author.Image)"
+									 alt="Author Image"
+									 class="img-thumbnail"
+									 style="width: 100%; height: 250px; object-fit: cover;" />
+							}
+							else
+							{
+								<img src="/images/default-author.jpg"
+									 alt="No Image Available"
+									 class="img-thumbnail"
+									 style="width: 100%; height: 250px; object-fit: cover;" />
+							}
+							<h5 class="card-title" style="font-size: 1.5vw;">@author.Name</h5>
+							<p class="card-text text-center" style="font-size: 1vw;">@author.Description</p>
+						</div>
+					</div>
+				</a>
+			</div>
+		}
+	</div>
 </div>
 
 <style>
-    .d-flex {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 20px; /* Spacing between items */
-    }
+	.d-flex {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 20px; /* Spacing between items */
+	}
 
-    .card-item {
-        flex: 1 1 22%; /* Allow items to shrink, grow, and take up around 22% of container width */
-        min-width: 200px; /* Minimum width to ensure consistency */
-        max-width: 25%; /* Ensures no item exceeds 25% width */
-        box-sizing: border-box;
-        transition: transform 0.3s ease-in-out; /* Smooth transition for scale effect */
-    }
+	.card-item {
+		flex: 1 1 22%; /* Allow items to shrink, grow, and take up around 22% of container width */
+		min-width: 200px; /* Minimum width to ensure consistency */
+		max-width: 25%; /* Ensures no item exceeds 25% width */
+		box-sizing: border-box;
+		transition: transform 0.3s ease-in-out; /* Smooth transition for scale effect */
+	}
 
-        .card-item:hover {
-            transform: scale(1.02); /* Slightly enlarge the card on hover */
-        }
+		.card-item:hover {
+			transform: scale(1.02); /* Slightly enlarge the card on hover */
+		}
 
-    .card {
-        height: 100%;
-        cursor: pointer; /* Show pointer cursor when hovering over the card */
-    }
+	.card {
+		height: 100%;
+		cursor: pointer; /* Show pointer cursor when hovering over the card */
+	}
 
-        .card img {
-            width: 100%;
-            height: 20rem;
-            object-fit: cover;
-            transition: transform 0.3s ease-in-out; /* Smooth transition for image scaling */
-        }
+		.card img {
+			width: 100%;
+			height: 20rem;
+			object-fit: cover;
+			transition: transform 0.3s ease-in-out; /* Smooth transition for image scaling */
+		}
 
-    .card-link {
-        text-decoration: none; /* Remove default link styling */
-        color: inherit;
-    }
+	.card-link {
+		text-decoration: none; /* Remove default link styling */
+		color: inherit;
+	}
 
-        .card-link:hover .card {
-            transform: scale(1.02); /* Apply the scale effect to the card on hover */
-            transition: transform 0.3s ease-in-out;
-        }
+		.card-link:hover .card {
+			transform: scale(1.02); /* Apply the scale effect to the card on hover */
+			transition: transform 0.3s ease-in-out;
+		}
 
-    /* Ensure the image scaling also feels smooth on hover */
-    .card-item:hover .card img {
-        transform: scale(1.02); /* Slight image scale on hover */
-        transition: transform 0.3s ease-in-out;
-    }
+	/* Ensure the image scaling also feels smooth on hover */
+	.card-item:hover .card img {
+		transform: scale(1.02); /* Slight image scale on hover */
+		transition: transform 0.3s ease-in-out;
+	}
 </style>

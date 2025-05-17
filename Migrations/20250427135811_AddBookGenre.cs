@@ -105,11 +105,43 @@ namespace LibrarySystem.Migrations
                 name: "IX_BookGenre_GenreId",
                 table: "BookGenre",
                 column: "GenreId");
+
+            migrationBuilder.InsertData(
+            table: "Genre",
+            columns: new[] { "Id", "Name" },
+            values: new object[,]
+            {
+                { 1, "Fiction" },
+                { 2, "Non-Fiction" },
+                { 3, "Science Fiction" },
+                { 4, "Fantasy" },
+                { 5, "Mystery" },
+                { 6, "Biography" },
+                { 7, "Romance" },
+                { 8, "Horror" },
+                { 9, "Thriller" },
+                { 10, "Historical" },
+                { 11, "Self-Help" },
+                { 12, "Poetry" },
+                { 13, "Graphic Novel" },
+                { 14, "Children's" },
+                { 15, "Adventure" }
+            });
+
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            for (int id = 1; id <= 15; id++)
+            {
+                migrationBuilder.DeleteData(
+                    table: "Genre",
+                    keyColumn: "Id",
+                    keyValue: id
+                );
+            }
+
             migrationBuilder.DropTable(
                 name: "BookGenre");
 
