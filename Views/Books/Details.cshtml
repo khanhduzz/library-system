@@ -96,14 +96,14 @@
                 <a asp-action="Edit" asp-route-id="@Model?.Book.Id" class="btn btn-primary">Edit</a>
                 @if (User.Identity.IsAuthenticated)
                 {
-                    @* @if (Model.IsBorrowedByUser)
+                    @if (Model.IsBorrowedByUser)
                     {
                         <form method="post" asp-action="Return" asp-controller="Books">
                             <input type="hidden" name="bookId" value="@Model.Book.Id" />
                             <button type="submit" class="btn btn-warning">Return</button>
                         </form>
                     }
-                    else if (Model.Book.IsAvailable)
+                    else if (Model.IsAvailableForRent)
                     {
                         <form method="post" asp-action="Borrow" asp-controller="Books">
                             <input type="hidden" name="bookId" value="@Model.Book.Id" />
@@ -113,7 +113,7 @@
                     else
                     {
                         <span class="text-muted">Not available</span>
-                    } *@
+                    }
                 }
                 <a asp-action="Index" class="btn btn-secondary">Back to List</a>
             </div>

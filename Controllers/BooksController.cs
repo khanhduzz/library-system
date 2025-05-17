@@ -31,7 +31,7 @@ namespace LibrarySystem.Controllers
 
             if (!string.IsNullOrEmpty(searchString))
             {
-                booksQuery = booksQuery.Where(b => b.Title.Contains(searchString) || b.Author.Name.Contains(searchString));
+                booksQuery = booksQuery.Where(b => b.Title.Contains(searchString) || b.Author.Name.Contains(searchString) || b.ISBN.Contains(searchString));
             }
 
             var paginatedBooks = await PaginatedList<Book>.CreateAsync(booksQuery.OrderBy(b => b.Title), page, pageSize, searchString);
@@ -51,21 +51,32 @@ namespace LibrarySystem.Controllers
             }
 
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-            var inventory = await _context.Inventory
+            Inventory inventory = await _context.Inventory
+                .Include(i => i.BorrowedBooks)
                 .FirstOrDefaultAsync(i => i.BookId == id);
 
-            // Then query BorrowedBook with the userId
-            //var borrowed;
-            //if (inventory != null)
-            //{
-            //    borrowed = await _context.BorrowedBook
-            //        .FirstOrDefaultAsync(b => b.InventoryId == inventory.Id && b.UserId == userId && b.ReturnDate == null);
-            //}
+            bool isAvailableForRent = false;
+            bool borrowedBook = false;
 
+            if (inventory != null)
+            {
+                List<BorrowedBook> list = inventory.BorrowedBooks.ToList();
+                isAvailableForRent = inventory.AvailableCopies > 0;
+                foreach (BorrowedBook borrowed in list)
+                {
+                    if (borrowed.UserId == userId && borrowed.ReturnDate == null)
+                    {
+                        borrowedBook = true;
+                        isAvailableForRent = false;
+                        break;
+                    }
+                }
+            }
             var viewModel = new BookDetailsViewModel
             {
                 Book = book,
-                //IsBorrowedByUser = borrowed != null
+                IsBorrowedByUser = borrowedBook,
+                IsAvailableForRent = isAvailableForRent,
             };
 
             return View(viewModel);
@@ -262,14 +273,36 @@ namespace LibrarySystem.Controllers
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
 
-            var inventory = await _context.Inventory
-                            .FirstOrDefaultAsync(i => i.BookId == bookId);
+            //var inventory = await _context.Inventory
+            //                .FirstOrDefaultAsync(i => i.BookId == bookId);
 
-            // Then query BorrowedBook with the userId
-            var borrowed = await _context.BorrowedBook
-                .FirstOrDefaultAsync(b => b.InventoryId == inventory.Id && b.UserId == userId && b.ReturnDate == null);
+            //// Then query BorrowedBook with the userId
+            //var borrowed = await _context.BorrowedBook
+            //    .FirstOrDefaultAsync(b => b.InventoryId == inventory.Id && b.UserId == userId && b.ReturnDate == null);
 
-            if (borrowed != null)
+            Inventory inventory = await _context.Inventory
+                .Include(i => i.BorrowedBooks)
+                .FirstOrDefaultAsync(i => i.BookId == bookId);
+
+            bool isAvailableForRent = false;
+            bool borrowedBook = false;
+
+            if (inventory != null)
+            {
+                List<BorrowedBook> list = inventory.BorrowedBooks.ToList();
+                isAvailableForRent = inventory.AvailableCopies > 0;
+                foreach (BorrowedBook borrowed in list)
+                {
+                    if (borrowed.UserId == userId && borrowed.ReturnDate == null)
+                    {
+                        borrowedBook = true;
+                        isAvailableForRent = false;
+                        break;
+                    }
+                }
+            }
+
+            if (borrowedBook)
             {
                 TempData["Error"] = "You have already borrowed this book and haven't returned it yet.";
                 return RedirectToAction("Details", new { id = bookId });
@@ -283,7 +316,7 @@ namespace LibrarySystem.Controllers
             }
 
             //var inventory = await _context.Inventory.FirstOrDefaultAsync(i => i.BookId == book.Id);
-            if (inventory == null || inventory.AvailableCopies <= 0)
+            if (!isAvailableForRent)
             {
                 TempData["Error"] = "No copies available to borrow.";
                 return RedirectToAction("Details", new { id = bookId });
@@ -307,14 +340,29 @@ namespace LibrarySystem.Controllers
                 return RedirectToAction("Details", new { id = bookId });
             }
 
-            var inventory = await _context.Inventory
-                            .FirstOrDefaultAsync(i => i.BookId == bookId);
+            Inventory inventory = await _context.Inventory
+            .Include(i => i.BorrowedBooks)
+            .FirstOrDefaultAsync(i => i.BookId == bookId);
 
-            // Then query BorrowedBook with the userId
-            var borrowed = await _context.BorrowedBook
-                .FirstOrDefaultAsync(b => b.InventoryId == inventory.Id && b.UserId == userId && b.ReturnDate != null);
+            bool isAvailableForRent = false;
+            bool borrowedBook = false;
 
-            if (borrowed == null)
+            if (inventory != null)
+            {
+                List<BorrowedBook> list = inventory.BorrowedBooks.ToList();
+                isAvailableForRent = inventory.AvailableCopies > 0;
+                foreach (BorrowedBook borrowed in list)
+                {
+                    if (borrowed.UserId == userId && borrowed.ReturnDate == null)
+                    {
+                        borrowedBook = true;
+                        isAvailableForRent = false;
+                        break;
+                    }
+                }
+            }
+
+            if (!borrowedBook)
             {
                 TempData["Error"] = "This book was not borrowed or is already returned.";
                 return RedirectToAction("Details", new { id = bookId });
@@ -327,19 +375,33 @@ namespace LibrarySystem.Controllers
 
         public async Task ReturnBookAsync(int userId, int bookId)
         {
-            var inventory = await _context.Inventory
-                .FirstOrDefaultAsync(i => i.BookId == bookId);
+            Inventory inventory = await _context.Inventory
+            .Include(i => i.BorrowedBooks)
+            .FirstOrDefaultAsync(i => i.BookId == bookId);
 
-            // Then query BorrowedBook with the userId
-            var borrowed = await _context.BorrowedBook
-                .FirstOrDefaultAsync(b => b.InventoryId == inventory.Id && b.UserId == userId && b.ReturnDate == null);
+            bool isAvailableForRent = false;
+            bool borrowedBook = false;
 
-            if (borrowed == null)
+            if (inventory != null)
+            {
+                List<BorrowedBook> list = inventory.BorrowedBooks.ToList();
+                isAvailableForRent = inventory.AvailableCopies > 0;
+                foreach (BorrowedBook borrowed in list)
+                {
+                    if (borrowed.UserId == userId && borrowed.ReturnDate == null)
+                    {
+                        borrowed.ReturnDate = DateTime.UtcNow;
+                        borrowedBook = true;
+                        isAvailableForRent = false;
+                        break;
+                    }
+                }
+            }
+
+            if (!borrowedBook)
             {
                 throw new InvalidOperationException("This book was not borrowed or already returned.");
             }
-
-            borrowed.ReturnDate = DateTime.UtcNow;
 
             if (inventory != null)
             {
@@ -353,15 +415,37 @@ namespace LibrarySystem.Controllers
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
 
-            var inventory = await _context.Inventory
+            //var inventory = await _context.Inventory
+            //    .FirstOrDefaultAsync(i => i.BookId == bookId);
+
+            Inventory inventory = await _context.Inventory
+                .Include(i => i.BorrowedBooks)
                 .FirstOrDefaultAsync(i => i.BookId == bookId);
 
-            if (inventory == null || inventory.AvailableCopies <= 0)
+            bool isAvailableForRent = false;
+            bool borrowedBook = false;
+
+            if (inventory != null)
+            {
+                List<BorrowedBook> list = inventory.BorrowedBooks.ToList();
+                isAvailableForRent = inventory.AvailableCopies > 0;
+                foreach (BorrowedBook borrowed in list)
+                {
+                    if (borrowed.UserId == userId && borrowed.ReturnDate == null)
+                    {
+                        borrowedBook = true;
+                        isAvailableForRent = false;
+                        break;
+                    }
+                }
+            }
+
+            if (!isAvailableForRent)
             {
                 throw new InvalidOperationException("No copies available to borrow.");
             }
 
-            var borrowedBook = new BorrowedBook
+            var borrow = new BorrowedBook
             {
                 UserId = userId,
                 InventoryId = inventory.Id,
@@ -371,7 +455,7 @@ namespace LibrarySystem.Controllers
 
             inventory.AvailableCopies -= 1;
 
-            _context.BorrowedBook.Add(borrowedBook);
+            _context.BorrowedBook.Add(borrow);
             await _context.SaveChangesAsync();
         }
     }
