@@ -15,7 +15,7 @@ using System.Net;
 namespace LibrarySystem.Controllers
 {
     [Authorize]
-    public class BooksController : Controller
+    public class BooksController : BaseController
     {
         private readonly LibrarySystemContext _context;
 
@@ -47,35 +47,20 @@ namespace LibrarySystem.Controllers
 
             if (book == null)
             {
-                return NotFound();
+                return RedirectToAction("Error", "Home", new { statusCode = 404, message = "Book not found." });
             }
 
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-            Inventory inventory = await _context.Inventory
+            var userId = GetCurrentUserId();
+
+            Inventory? inventory = await _context.Inventory
                 .Include(i => i.BorrowedBooks)
                 .FirstOrDefaultAsync(i => i.BookId == id);
-
-            bool isAvailableForRent = false;
-            bool borrowedBook = false;
-
-            if (inventory != null)
-            {
-                List<BorrowedBook> list = inventory.BorrowedBooks.ToList();
-                isAvailableForRent = inventory.AvailableCopies > 0;
-                foreach (BorrowedBook borrowed in list)
-                {
-                    if (borrowed.UserId == userId && borrowed.ReturnDate == null)
-                    {
-                        borrowedBook = true;
-                        isAvailableForRent = false;
-                        break;
-                    }
-                }
-            }
+ 
+            CheckInventoryState(inventory, userId, out bool isAvailableForRent, out bool hasBorrowedBook);
             var viewModel = new BookDetailsViewModel
             {
                 Book = book,
-                IsBorrowedByUser = borrowedBook,
+                IsBorrowedByUser = hasBorrowedBook,
                 IsAvailableForRent = isAvailableForRent,
             };
 
@@ -271,38 +256,15 @@ namespace LibrarySystem.Controllers
         [Authorize]
         public async Task<IActionResult> Borrow(int bookId)
         {
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var userId = GetCurrentUserId();
 
-            //var inventory = await _context.Inventory
-            //                .FirstOrDefaultAsync(i => i.BookId == bookId);
-
-            //// Then query BorrowedBook with the userId
-            //var borrowed = await _context.BorrowedBook
-            //    .FirstOrDefaultAsync(b => b.InventoryId == inventory.Id && b.UserId == userId && b.ReturnDate == null);
-
-            Inventory inventory = await _context.Inventory
+            Inventory? inventory = await _context.Inventory
                 .Include(i => i.BorrowedBooks)
                 .FirstOrDefaultAsync(i => i.BookId == bookId);
 
-            bool isAvailableForRent = false;
-            bool borrowedBook = false;
+            CheckInventoryState(inventory, userId, out bool isAvailableForRent, out bool hasBorrowedBook);
 
-            if (inventory != null)
-            {
-                List<BorrowedBook> list = inventory.BorrowedBooks.ToList();
-                isAvailableForRent = inventory.AvailableCopies > 0;
-                foreach (BorrowedBook borrowed in list)
-                {
-                    if (borrowed.UserId == userId && borrowed.ReturnDate == null)
-                    {
-                        borrowedBook = true;
-                        isAvailableForRent = false;
-                        break;
-                    }
-                }
-            }
-
-            if (borrowedBook)
+            if (hasBorrowedBook)
             {
                 TempData["Error"] = "You have already borrowed this book and haven't returned it yet.";
                 return RedirectToAction("Details", new { id = bookId });
@@ -331,7 +293,7 @@ namespace LibrarySystem.Controllers
         [Authorize]
         public async Task<IActionResult> Return(int bookId)
         {
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var userId = GetCurrentUserId();
 
             var book = await _context.Book.FirstOrDefaultAsync(b => b.Id == bookId);
             if (book == null)
@@ -340,29 +302,13 @@ namespace LibrarySystem.Controllers
                 return RedirectToAction("Details", new { id = bookId });
             }
 
-            Inventory inventory = await _context.Inventory
+            Inventory? inventory = await _context.Inventory
             .Include(i => i.BorrowedBooks)
             .FirstOrDefaultAsync(i => i.BookId == bookId);
 
-            bool isAvailableForRent = false;
-            bool borrowedBook = false;
+            CheckInventoryState(inventory, userId, out bool isAvailableForRent, out bool hasBorrowedBook);
 
-            if (inventory != null)
-            {
-                List<BorrowedBook> list = inventory.BorrowedBooks.ToList();
-                isAvailableForRent = inventory.AvailableCopies > 0;
-                foreach (BorrowedBook borrowed in list)
-                {
-                    if (borrowed.UserId == userId && borrowed.ReturnDate == null)
-                    {
-                        borrowedBook = true;
-                        isAvailableForRent = false;
-                        break;
-                    }
-                }
-            }
-
-            if (!borrowedBook)
+            if (!hasBorrowedBook)
             {
                 TempData["Error"] = "This book was not borrowed or is already returned.";
                 return RedirectToAction("Details", new { id = bookId });
@@ -375,30 +321,13 @@ namespace LibrarySystem.Controllers
 
         public async Task ReturnBookAsync(int userId, int bookId)
         {
-            Inventory inventory = await _context.Inventory
+            Inventory? inventory = await _context.Inventory
             .Include(i => i.BorrowedBooks)
             .FirstOrDefaultAsync(i => i.BookId == bookId);
 
-            bool isAvailableForRent = false;
-            bool borrowedBook = false;
+            CheckInventoryState(inventory, userId, out bool isAvailableForRent, out bool hasBorrowedBook);
 
-            if (inventory != null)
-            {
-                List<BorrowedBook> list = inventory.BorrowedBooks.ToList();
-                isAvailableForRent = inventory.AvailableCopies > 0;
-                foreach (BorrowedBook borrowed in list)
-                {
-                    if (borrowed.UserId == userId && borrowed.ReturnDate == null)
-                    {
-                        borrowed.ReturnDate = DateTime.UtcNow;
-                        borrowedBook = true;
-                        isAvailableForRent = false;
-                        break;
-                    }
-                }
-            }
-
-            if (!borrowedBook)
+            if (!hasBorrowedBook)
             {
                 throw new InvalidOperationException("This book was not borrowed or already returned.");
             }
@@ -413,32 +342,13 @@ namespace LibrarySystem.Controllers
 
         public async Task BorrowBookAsync(int bookId)
         {
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var userId = GetCurrentUserId();
 
-            //var inventory = await _context.Inventory
-            //    .FirstOrDefaultAsync(i => i.BookId == bookId);
-
-            Inventory inventory = await _context.Inventory
+            Inventory? inventory = await _context.Inventory
                 .Include(i => i.BorrowedBooks)
                 .FirstOrDefaultAsync(i => i.BookId == bookId);
 
-            bool isAvailableForRent = false;
-            bool borrowedBook = false;
-
-            if (inventory != null)
-            {
-                List<BorrowedBook> list = inventory.BorrowedBooks.ToList();
-                isAvailableForRent = inventory.AvailableCopies > 0;
-                foreach (BorrowedBook borrowed in list)
-                {
-                    if (borrowed.UserId == userId && borrowed.ReturnDate == null)
-                    {
-                        borrowedBook = true;
-                        isAvailableForRent = false;
-                        break;
-                    }
-                }
-            }
+            CheckInventoryState(inventory, userId, out bool isAvailableForRent, out bool hasBorrowedBook);
 
             if (!isAvailableForRent)
             {
@@ -457,6 +367,26 @@ namespace LibrarySystem.Controllers
 
             _context.BorrowedBook.Add(borrow);
             await _context.SaveChangesAsync();
+        }
+        private void CheckInventoryState(Inventory? inventory, int userId, out bool isAvailableForRent, out bool hasBorrowedBook)
+        {
+            isAvailableForRent = false;
+            hasBorrowedBook = false;
+
+            if (inventory != null)
+            {
+                isAvailableForRent = inventory.AvailableCopies > 0;
+
+                foreach (var borrowed in inventory.BorrowedBooks)
+                {
+                    if (borrowed.UserId == userId && borrowed.ReturnDate == null)
+                    {
+                        hasBorrowedBook = true;
+                        isAvailableForRent = false;
+                        break;
+                    }
+                }
+            }
         }
     }
 }

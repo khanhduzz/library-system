@@ -41,7 +41,7 @@ namespace LibrarySystem.Controllers
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         [Route("/Home/Error/{statusCode}")]
-        public IActionResult Error(int statusCode)
+        public IActionResult Error(int statusCode, string? message)
         {
             var viewModel = new ErrorViewModel
             {
@@ -62,6 +62,11 @@ namespace LibrarySystem.Controllers
                 default:
                     viewModel.Message = "An unexpected error occurred.";
                     break;
+            }
+
+            if (!string.IsNullOrEmpty(message))
+            {
+                viewModel.Message = message;
             }
 
             return View(viewModel);

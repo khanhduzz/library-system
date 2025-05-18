@@ -9,13 +9,11 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
 </head>
 <body>
-    <div class="container">
+    <div class="container d-flex flex-column justify-content-center" style="height: 70vh">
         <div class="text-center">
-            <p class="display-6">Error @Model.StatusCode</p>
-            @* <p>@Model.Message</p> *@
-            <h1 class="text-danger">@Model.Message</h1>
-            <p class="lead">You don't have access to this resource or something unexpected happened.</p>
-            <a href="@Url.Action("Index", "Home")" class="btn btn-primary">Go Back to Home</a>
+            <p class="text-danger">Error @Model.StatusCode</p>
+            <p class="lead">@Model.Message</p>
+            @* <a href="@Url.Action("Index", "Home")" class="btn btn-primary">Go Back to Home</a> *@
         </div>
     </div>
 </body>
