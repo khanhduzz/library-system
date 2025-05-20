@@ -16,6 +16,8 @@ A web-based Library Management System built with **ASP.NET Core MVC** and **Enti
 ---
 
 ## 🛠️ Features
+- Default user admin: david123 - david123
+- Default user: turing123 - turing123
 
 ### 👤 User Roles
 
