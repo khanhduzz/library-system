@@ -24,6 +24,8 @@ namespace LibrarySystem.Controllers
         public async Task<IActionResult> Index()
         {
             var librarySystemContext = _context.Inventory.Include(i => i.Book);
+            ViewData["BookId"] = new SelectList(_context.Book, "Id", "Title");
+            ViewData["Condition"] = new SelectList(Enum.GetValues(typeof(BookCondition)));
             return View(await librarySystemContext.ToListAsync());
         }
 

@@ -119,7 +119,7 @@ namespace LibrarySystem.Controllers
         {
             if (id == null)
             {
-                return NotFound();
+                return RedirectToAction("Error", "Home", new { statusCode = 404, message = "Book not found." });
             }
 
             var book = await _context.Book
@@ -128,7 +128,7 @@ namespace LibrarySystem.Controllers
 
             if (book == null)
             {
-                return NotFound();
+                return RedirectToAction("Error", "Home", new { statusCode = 404, message = "Book not found." });
             }
 
             ViewData["AuthorId"] = new SelectList(_context.Set<Author>(), "Id", "Name", book.AuthorId);
@@ -144,7 +144,7 @@ namespace LibrarySystem.Controllers
         {
             if (id != updatedBook.Id)
             {
-                return NotFound();
+                return RedirectToAction("Error", "Home", new { statusCode = 404, message = "Book not found." });
             }
 
             if (await _context.Book.AnyAsync(b => b.ISBN == updatedBook.ISBN && b.Id != updatedBook.Id))

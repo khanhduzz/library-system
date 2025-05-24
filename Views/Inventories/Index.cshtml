@@ -1,60 +1,221 @@
 ﻿@model IEnumerable<LibrarySystem.Models.Inventory>
 
 @{
-	ViewData["Title"] = "Index";
+    ViewData["Title"] = "Inventory";
 }
 
-<h1>Index</h1>
+<div class="container mt-4 p-4 rounded shadow-sm" style="background-color: #f8f9fa;">
+    <h1 class="mb-4">Inventory</h1>
 
-<p>
-	<a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-	<thead>
-		<tr>
-			<th>
-				@Html.DisplayNameFor(model => model.Book.Title)
-			</th>
-			<th>
-				@Html.DisplayNameFor(model => model.Book)
-			</th>
-			<th>
-				@Html.DisplayNameFor(model => model.TotalCopies)
-			</th>
-			<th>
-				@Html.DisplayNameFor(model => model.AvailableCopies)
-			</th>
-			<th>
-				@Html.DisplayNameFor(model => model.Condition)
-			</th>
-			<th></th>
-		</tr>
-	</thead>
-	<tbody>
-		@foreach (var item in Model)
-		{
-			<tr>
-				<td>
-					@Html.DisplayFor(modelItem => item.Book.Title)
-				</td>
-				<td>
-					@Html.DisplayFor(modelItem => item.Book.ISBN)
-				</td>
-				<td>
-					@Html.DisplayFor(modelItem => item.TotalCopies)
-				</td>
-				<td>
-					@Html.DisplayFor(modelItem => item.AvailableCopies)
-				</td>
-				<td>
-					@Html.DisplayFor(modelItem => item.Condition)
-				</td>
-				<td>
-					<a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-					<a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-					<a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-				</td>
-			</tr>
-		}
-	</tbody>
-</table>
+    <!-- Create Button -->
+    <p>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createModal">+ Add Inventory</button>
+    </p>
+
+    <!-- Inventory Table -->
+    <table class="table table-bordered table-striped">
+        <thead class="thead-dark">
+            <tr>
+                <th>@Html.DisplayNameFor(model => model.First().Book.Title)</th>
+                <th>@Html.DisplayNameFor(model => model.First().Book.ISBN)</th>
+                <th>@Html.DisplayNameFor(model => model.First().TotalCopies)</th>
+                <th>@Html.DisplayNameFor(model => model.First().AvailableCopies)</th>
+                <th>@Html.DisplayNameFor(model => model.First().Condition)</th>
+                <th style="width: 250px;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Book.Title</td>
+                    <td>@item.Book.ISBN</td>
+                    <td>@item.TotalCopies</td>
+                    <td>@item.AvailableCopies</td>
+                    <td>@item.Condition</td>
+                    <td>
+                        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editModal"
+                                data-id="@item.Id" data-book="@item.Book.Title" data-isbn="@item.Book.ISBN"
+                                data-total="@item.TotalCopies" data-available="@item.AvailableCopies" data-condition="@item.Condition">
+                            <i class="bi bi-pencil-square me-1"></i>Edit
+                        </button>
+                        <button class="btn btn-info btn-sm text-white" data-bs-toggle="modal" data-bs-target="#detailModal"
+                                data-id="@item.Id" data-book="@item.Book.Title" data-isbn="@item.Book.ISBN"
+                                data-total="@item.TotalCopies" data-available="@item.AvailableCopies" data-condition="@item.Condition">
+                            <i class="bi bi-info-circle me-1"></i>Details
+                        </button>
+                        <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal"
+                                data-id="@item.Id" data-book="@item.Book.Title">
+                            <i class="bi bi-trash me-1"></i>Delete
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<!-- Modals -->
+<!-- Create Modal -->
+<div class="modal fade" id="createModal" tabindex="-1" aria-labelledby="createModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form asp-action="Create" method="post">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="createModalLabel">Add Inventory</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <div class="form-group">
+                        <label for="BookId">Book</label>
+                        <select name="BookId" class="form-control" asp-items="ViewBag.BookId"></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Total Copies</label>
+                        <input name="TotalCopies" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <label>Available Copies</label>
+                        <input name="AvailableCopies" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <label for="Condition">Condition</label>
+                        <select name="Condition" class="form-control" asp-items="ViewBag.Condition"></select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Add</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<!-- Edit Modal -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form asp-action="Edit" method="post">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="editModalLabel">Edit Inventory</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="Id" id="editId" />
+                    <div class="form-group">
+                        <label for="editBookId">Book</label>
+                        <select name="BookId" id="editBookId" class="form-control" asp-items="ViewBag.BookId" disabled></select>
+                        <select name="BookId" id="editBookId" class="form-control" asp-items="ViewBag.BookId" hidden></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Total Copies</label>
+                        <input name="TotalCopies" id="editTotal" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <label>Available Copies</label>
+                        <input name="AvailableCopies" id="editAvailable" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <label for="editCondition">Condition</label>
+                        <select name="Condition" id="editCondition" class="form-control" asp-items="ViewBag.Condition">
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="deleteForm" method="post">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete inventory for "<span id="deleteBookTitle"></span>"?
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Detail Modal -->
+<div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="detailModalLabel">Inventory Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <dl class="row">
+                    <dt class="col-sm-4">Book</dt>
+                    <dd class="col-sm-8" id="detailBook"></dd>
+
+                    <dt class="col-sm-4">ISBN</dt>
+                    <dd class="col-sm-8" id="detailISBN"></dd>
+
+                    <dt class="col-sm-4">Total Copies</dt>
+                    <dd class="col-sm-8" id="detailTotal"></dd>
+
+                    <dt class="col-sm-4">Available</dt>
+                    <dd class="col-sm-8" id="detailAvailable"></dd>
+
+                    <dt class="col-sm-4">Condition</dt>
+                    <dd class="col-sm-8" id="detailCondition"></dd>
+                </dl>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Edit Modal
+        $('#editModal').on('show.bs.modal', function (event) {
+            const button = $(event.relatedTarget);
+            $('#editId').val(button.data('id'));
+            $('#editTotal').val(button.data('total'));
+            $('#editAvailable').val(button.data('available'));
+            $('#editCondition').val(button.data('condition'));
+        });
+
+        // Delete Modal
+        $('#deleteModal').on('show.bs.modal', function (event) {
+            const button = $(event.relatedTarget);
+            const id = button.data('id');
+            const title = button.data('book');
+            $('#deleteBookTitle').text(title);
+            $('#deleteForm').attr('action', '/Inventory/Delete/' + id);
+        });
+
+        // Detail Modal
+        $('#detailModal').on('show.bs.modal', function (event) {
+            const button = $(event.relatedTarget);
+            $('#detailBook').text(button.data('book'));
+            $('#detailISBN').text(button.data('isbn'));
+            $('#detailTotal').text(button.data('total'));
+            $('#detailAvailable').text(button.data('available'));
+            $('#detailCondition').text(button.data('condition'));
+        });
+    </script>
+}
