@@ -39,21 +39,58 @@ namespace LibrarySystem.Data
                 .HasOne(bg => bg.Genre)
                 .WithMany(g => g.BookGenres)
                 .HasForeignKey(bg => bg.GenreId);
-
-            //modelBuilder.Entity<BorrowedBook>()
-            //    .HasKey(bb => new { bb.Id });
-
-            //modelBuilder.Entity<BorrowedBook>()
-            //    .HasOne(bb => bb.User)
-            //    .WithMany(u => u.BorrowedBooks)
-            //    .HasForeignKey(bb => bb.UserId)
-            //    .OnDelete(DeleteBehavior.Restrict);
-
-            //modelBuilder.Entity<BorrowedBook>()
-            //    .HasOne(bb => bb.Book)
-            //    .WithMany(b => b.BorrowedBooks)
-            //    .HasForeignKey(bb => bb.BookId)
-            //    .OnDelete(DeleteBehavior.Restrict);
         }
+        public void SeedAuthorImages()
+        {
+            var imageDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "authors");
+
+            var authorImageMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+            {
+                { "Dan Brown", "dan-brown.jpg" },
+                { "Thomas Harris", "thomas-harris.jpg" },
+                { "Agatha Christie", "agatha-christie.jpg" },
+                { "J.K. Rowling", "j-k-rowling.jpg" },
+                { "Stephen King", "stephen-king.jpg" },
+                { "George R.R. Martin", "george-rr-martin.jpg" },
+                { "J.R.R. Tolkien", "jrrr-tolkien.jpg" },
+                { "Haruki Murakami", "haruki-murakami.jpg" },
+                { "Jane Austen", "jane-austen.jpg" },
+                { "Ernest Hemingway", "ernest-hemingway.webp" }
+            };
+
+            var authors = Author.ToList();
+            bool updated = false;
+
+            foreach (var author in authors)
+            {
+                if (author.Image != null)
+                    continue;
+
+                if (authorImageMap.TryGetValue(author.Name, out var fileName))
+                {
+                    var imagePath = Path.Combine(imageDir, fileName);
+
+                    if (File.Exists(imagePath))
+                    {
+                        author.Image = File.ReadAllBytes(imagePath);
+                        updated = true;
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Image not found for author: {author.Name} at {imagePath}");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine($"No image mapping found for author: {author.Name}");
+                }
+            }
+
+            if (updated)
+            {
+                SaveChanges();
+            }
+        }
+
     }
 }
