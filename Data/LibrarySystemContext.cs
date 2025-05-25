@@ -92,5 +92,66 @@ namespace LibrarySystem.Data
             }
         }
 
+        public void SeedBookImages()
+        {
+            var imageDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "books");
+
+            var bookImageMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+            {
+                { "The Da Vinci Code", "the-da-vinci-code.jpg" },
+                { "Angels & Demons", "angels-and-demons.jpg" },
+                { "The Silence of the Lambs", "the-silence-of-the-lambs.jpg" },
+                { "Red Dragon", "red-dragon.jpg" },
+                { "Murder on the Orient Express", "murder-on-the-orient-express.jpg" },
+                { "And Then There Were None", "and-then-there-were-none.jpg" },
+                { "Harry Potter and the Sorcerer's Stone", "harry-potter-and-the-sorcerers-stone.jpg" },
+                { "Harry Potter and the Chamber of Secrets", "harry-potter-and-the-chamber-of-secrets.jpg" },
+                { "The Shining", "the-shining.jpg" },
+                { "It", "it.jpg" },
+                { "A Game of Thrones", "a-game-of-thrones.jpg" },
+                { "A Clash of Kings", "a-clash-of-kings.jpg" },
+                { "The Fellowship of the Ring", "the-fellowship-of-the-ring.jpg" },
+                { "The Two Towers", "the-two-towers.jpg" },
+                { "Kafka on the Shore", "kafka-on-the-shore.jpg" },
+                { "Norwegian Wood", "norwegian-wood.jpg" },
+                { "Pride and Prejudice", "pride-and-prejudice.jpg" },
+                { "Sense and Sensibility", "sense-and-sensibility.jpg" },
+                { "The Old Man and the Sea", "the-old-man-and-the-sea.jpg" },
+                { "A Farewell to Arms", "a-farewell-to-arms.jpg" }
+            };
+
+            var books = Book.ToList();
+            bool updated = false;
+
+            foreach (var book in books)
+            {
+                if (book.Image != null)
+                    continue;
+
+                if (bookImageMap.TryGetValue(book.Title, out var fileName))
+                {
+                    var imagePath = Path.Combine(imageDir, fileName);
+
+                    if (File.Exists(imagePath))
+                    {
+                        book.Image = File.ReadAllBytes(imagePath);
+                        updated = true;
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Image not found for book: {book.Title} at {imagePath}");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine($"No image mapping found for book: {book.Title}");
+                }
+            }
+
+            if (updated)
+            {
+                SaveChanges();
+            }
+        }
     }
 }

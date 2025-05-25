@@ -1,35 +1,188 @@
 ﻿@model IEnumerable<LibrarySystem.Models.Genre>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Genres";
 }
 
-<h1>Index</h1>
+<div class="container mt-4 p-4 rounded shadow-sm" style="background-color: #f8f9fa;">
+    <h1 class="mb-4">Genres</h1>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Name)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
+    <!-- Button to trigger Create Genre Modal -->
+    <p>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createModal">+ Create New Genre</button>
+    </p>
+
+    <!-- Table to display genres -->
+    <table class="table table-bordered table-striped">
+        <thead class="thead-dark">
+            <tr>
+                <th>@Html.DisplayNameFor(model => model.First().Name)</th>
+                <th style="width: 250px;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Name</td>
+                    <td>
+                        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editModal" data-id="@item.Id" data-name="@item.Name">
+                            <i class="bi bi-pencil-square me-1"></i>Edit
+                        </button>
+                        <button class="btn btn-info btn-sm text-white" data-bs-toggle="modal" data-bs-target="#detailModal" data-id="@item.Id" data-name="@item.Name">
+                            <i class="bi bi-info-circle me-1"></i>Details
+                        </button>
+                        <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal" data-id="@item.Id" data-name="@item.Name">
+                            <i class="bi bi-trash me-1"></i>Delete
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<!-- Create Modal -->
+<div class="modal fade" id="createModal" tabindex="-1" aria-labelledby="createModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form asp-action="Create" method="post">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="createModalLabel">Create New Genre</h5>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <div class="form-group">
+                        <label for="Name" class="control-label">Name</label>
+                        <input type="text" id="Name" name="Name" class="form-control" required />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form asp-action="Edit" method="post">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="editModalLabel">Edit Genre</h5>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <div class="form-group">
+                        <label for="EditName" class="control-label">Name</label>
+                        <input type="text" id="EditName" name="Name" class="form-control" required />
+                    </div>
+                    <input type="hidden" id="GenreId" name="Id" />
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="deleteForm" method="post">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete the genre "<span id="modalGenreName"></span>"?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Detail Modal -->
+<div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="detailModalLabel">Genre Details</h5>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <dl class="row">
+                    <dt class="col-sm-3">Genre ID</dt>
+                    <dd class="col-sm-9" id="detailGenreId"></dd>
+
+                    <dt class="col-sm-3">Name</dt>
+                    <dd class="col-sm-9" id="detailGenreName"></dd>
+                </dl>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        // Edit Modal setup
+        $('#editModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget);
+            var genreId = button.data('id');
+            var genreName = button.data('name');
+
+            var modal = $(this);
+            modal.find('#GenreId').val(genreId);
+            modal.find('#EditName').val(genreName);
+        });
+
+        // Delete Modal setup
+        $('#deleteModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget);
+            var genreId = button.data('id');
+            var genreName = button.data('name');
+
+            var modal = $(this);
+            modal.find('#modalGenreName').text(genreName);
+            modal.find('#deleteForm').attr('action', '/Genres/Delete/' + genreId);
+        });
+
+        // Detail Modal setup
+        $('#detailModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget);
+            var genreId = button.data('id');
+            var genreName = button.data('name');
+
+            var modal = $(this);
+            modal.find('#detailGenreId').text(genreId);
+            modal.find('#detailGenreName').text(genreName);
+        });
+    </script>
 }
-    </tbody>
-</table>
