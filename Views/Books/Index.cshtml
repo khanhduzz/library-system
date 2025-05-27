@@ -50,17 +50,17 @@
 						<td>@(item.IsAvailable ? "Yes" : "No")</td> *@
 						<td class="text-center" style="height: 100%;">
 							<div class="d-flex justify-content-center align-items-center gap-2 h-100">
-							<a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info btn-sm text-white">
-								<i class="bi bi-info-circle me-1"></i>Details
-							</a>
-							<admin-only>
-								<a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-primary btn-sm">
-									<i class="bi bi-pencil-square me-1"></i>Edit
+								<a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info btn-sm text-white" style="font-size: 12px;">
+									<i class="bi bi-info-circle me-1"></i>Details
 								</a>
-								<a href="#" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal" data-id="@item.Id" data-title="@item.Title">
-									<i class="bi bi-trash me-1"></i>Delete
-								</a>
-							</admin-only>
+								<admin-only>
+									<a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-primary btn-sm" style="font-size: 12px;">
+										<i class="bi bi-pencil-square me-1"></i>Edit
+									</a>
+									<a href="#" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal" data-id="@item.Id" data-title="@item.Title" style="font-size: 12px;">
+										<i class="bi bi-trash me-1"></i>Delete
+									</a>
+								</admin-only>
 							</div>
 						</td>
 					</tr>
@@ -70,11 +70,11 @@
 
 	</div>
 	@await Html.PartialAsync("Pagination", new PaginationViewModel
-	{
-		PageIndex = Model.PageIndex,
-		TotalPages = Model.TotalPages,
-		SearchString = Model.SearchString
-	})
+{
+	PageIndex = Model.PageIndex,
+	TotalPages = Model.TotalPages,
+	SearchString = Model.SearchString
+})
 </div>
 
 <!-- Admin-only Delete Modal -->

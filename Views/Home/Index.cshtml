@@ -1,122 +1,133 @@
 ﻿@model LibrarySystem.Generic.HomeViewModel
-
 @{
-	ViewData["Title"] = "Home Page";
+	ViewData["Title"] = "Home";
 }
 
-<div class="container-fluid mt-5 p-0">
-	<h1 class="mb-4" style="font-size: 3vw;">Welcome to Library System</h1>
-
-	<h2 class="text-primary mb-3" style="font-size: 2.5vw;">Books</h2>
-	<div class="d-flex flex-wrap justify-content-center">
-		@foreach (var book in Model.Books)
-		{
-			<div class="card-item">
-				<a href="@Url.Action("Details", "Books", new { id = book.Id })" class="card-link">
-					<div class="card h-100 border-primary">
-						<div class="card-body d-flex flex-column align-items-center gap-0">
-							@if (book.Image != null)
-							{
-								<img src="data:image/jpeg;base64,@Convert.ToBase64String(book.Image)"
-									 alt="Book Image"
-									 class="img-thumbnail"
-									 style="width: 100%; height: 15rem; object-fit: cover;" />
-							}
-							else
-							{
-								<img src="/images/default-book-3.png"
-									 alt="No Image Available"
-									 class="img-thumbnail"
-									 style="width: 100%; height: 15rem; object-fit: cover;" />
-							}
-							<h5 class="card-title" style="font-size: 1.5vw;">@book.Title</h5>
-							<p class="card-text" style="font-size: 1vw;">@book.Description</p>
-							<p class="card-text" style="font-size: 0.9vw;">
-								<small class="text-muted">Author: @book.Author?.Name</small>
-							</p>
-						</div>
-					</div>
-				</a>
-			</div>
-		}
+<!-- Hero Section -->
+<section class="hero-section d-flex align-items-center">
+	<div class="hero-text-container">
+		<h1 class="display-3">Discover Your Next Favorite Book</h1>
+		<p class="lead">Explore featured books and authors in our library collection.</p>
+		<a href="#about" class="btn btn-primary btn-lg mt-3">Explore Now</a>
 	</div>
-
-	<h2 class="text-primary mt-5 mb-3" style="font-size: 2.5vw;">Authors</h2>
-	<div class="d-flex flex-wrap justify-content-center">
-		@foreach (var author in Model.Authors)
-		{
-			<div class="card-item">
-				<a href="@Url.Action("Details", "Authors", new { id = author.Id })" class="card-link">
-					<div class="card h-100 border-secondary">
-						<div class="card-body d-flex flex-column align-items-center gap-0">
-							@if (author.Image != null)
-							{
-								<img src="data:image/jpeg;base64,@Convert.ToBase64String(author.Image)"
-									 alt="Author Image"
-									 class="img-thumbnail"
-									 style="width: 100%; height: 15rem; object-fit: cover;" />
-							}
-							else
-							{
-								<img src="/images/default-author.jpg"
-									 alt="No Image Available"
-									 class="img-thumbnail"
-									 style="width: 100%; height: 15rem; object-fit: cover;" />
-							}
-							<h5 class="card-title" style="font-size: 1.5vw;">@author.Name</h5>
-							<p class="card-text text-center" style="font-size: 1vw;">@author.Description</p>
-						</div>
-					</div>
-				</a>
-			</div>
-		}
+	<div class="hero-image-container">
+		<img src="/images/hero-library.jpg" alt="Library Image" class="hero-image" />
 	</div>
-</div>
+</section>
+
+<!-- About Section -->
+<section id="about" class="content-section bg-light text-center py-5 my-5">
+	<div class="container my-5">
+		<h2 class="mb-4">About Our Library</h2>
+		<p class="lead">We provide access to a wide collection of books from various genres and authors. Our mission is to foster a love for reading and lifelong learning.</p>
+	</div>
+</section>
+
+<!-- Featured Books Section -->
+<section id="featured-books" class="content-section text-center py-5">
+	<div class="container">
+		<h2 class="mb-4 text-primary">Featured Books</h2>
+		<div class="d-flex flex-wrap justify-content-center">
+			@foreach (var book in Model.Books.Take(4)) // Show top 4
+			{
+				<div class="card m-3 shadow-sm" style="width: 13rem;">
+					@if (book.Image != null)
+					{
+						<img src="data:image/jpeg;base64,@Convert.ToBase64String(book.Image)"
+							 class="card-img-top" alt="@book.Title"
+							 style="width: 100%; height: 25rem; object-fit: cover;" />
+					}
+					else
+					{
+						<img src="/images/default-book-3.png"
+							 class="card-img-top" alt="No Image"
+							 style="width: 100%; height: 25rem; object-fit: cover;" />
+					}
+					<div class="card-body">
+						<h5 class="card-title">@book.Title</h5>
+						<p class="card-text text-muted truncate-3">@book.Description</p>
+					</div>
+				</div>
+			}
+		</div>
+	</div>
+</section>
+
+<!-- Featured Authors Section -->
+<section id="featured-authors" class="content-section bg-light text-center py-5">
+	<div class="container">
+		<h2 class="mb-4 text-primary">Featured Authors</h2>
+		<div class="d-flex flex-wrap justify-content-center">
+			@foreach (var author in Model.Authors.Take(4))
+			{
+				<div class="card m-3 shadow-sm" style="width: 13rem;">
+					@if (author.Image != null)
+					{
+						<img src="data:image/jpeg;base64,@Convert.ToBase64String(author.Image)"
+							 class="card-img-top" alt="@author.Name"
+							 style="width: 100%; height: 25rem; object-fit: cover;" />
+					}
+					else
+					{
+						<img src="/images/default-author.jpg"
+							 class="card-img-top" alt="No Image"
+							 style="width: 100%; height: 25rem; object-fit: cover;" />
+					}
+					<div class="card-body">
+						<h5 class="card-title">@author.Name</h5>
+						<p class="card-text text-muted truncate-3">@author.Description</p>
+					</div>
+				</div>
+			}
+		</div>
+	</div>
+</section>
 
 <style>
-	.d-flex {
+	.hero-section {
+		height: 100vh;
 		display: flex;
-		flex-wrap: wrap;
-		gap: 20px; /* Spacing between items */
+		position: relative;
+		background: linear-gradient(to right, #ffffff 50%, transparent 50%);
 	}
 
-	.card-item {
-		flex: 1 1 22%; /* Allow items to shrink, grow, and take up around 22% of container width */
-		min-width: 200px; /* Minimum width to ensure consistency */
-		max-width: 25%; /* Ensures no item exceeds 25% width */
-		box-sizing: border-box;
-		transition: transform 0.3s ease-in-out; /* Smooth transition for scale effect */
+	.hero-text-container {
+		position: absolute;
+		top: 50%;
+		left: 5%;
+		transform: translateY(-50%);
+		z-index: 2;
+		max-width: 40%;
+		background-color: rgba(255, 255, 255, 0.85);
+		padding: 2rem;
+		border-radius: 12px;
+		box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
 	}
 
-		.card-item:hover {
-			transform: scale(1.02); /* Slightly enlarge the card on hover */
-		}
-
-	.card {
+	.hero-image-container {
+		width: 60%;
+		margin-left: auto;
 		height: 100%;
-		cursor: pointer; /* Show pointer cursor when hovering over the card */
+		overflow: hidden;
 	}
 
-		.card img {
-			width: 100%;
-			height: 20rem;
-			object-fit: cover;
-			transition: transform 0.3s ease-in-out; /* Smooth transition for image scaling */
-		}
-
-	.card-link {
-		text-decoration: none; /* Remove default link styling */
-		color: inherit;
+	.hero-image {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		filter: brightness(0.9);
 	}
 
-		.card-link:hover .card {
-			transform: scale(1.02); /* Apply the scale effect to the card on hover */
-			transition: transform 0.3s ease-in-out;
-		}
-
-	/* Ensure the image scaling also feels smooth on hover */
-	.card-item:hover .card img {
-		transform: scale(1.02); /* Slight image scale on hover */
-		transition: transform 0.3s ease-in-out;
+	.content-section {
+		transition: all 0.3s ease-in-out;
 	}
+
+	.truncate-3 {
+		display: -webkit-box;
+		-webkit-line-clamp: 3;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
 </style>

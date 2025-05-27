@@ -38,6 +38,19 @@ namespace LibrarySystem.Controllers
         {
             return View();
         }
+        public async Task<IActionResult> Discover()
+        {
+            var books = await _context.Book.Include(b => b.Author).ToListAsync();
+            var authors = await _context.Author.ToListAsync();
+
+            var viewModel = new HomeViewModel
+            {
+                Books = books,
+                Authors = authors
+            };
+
+            return View(viewModel);
+        }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         [Route("/Home/Error/{statusCode}")]
