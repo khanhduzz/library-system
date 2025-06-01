@@ -55,7 +55,7 @@ namespace LibrarySystem.Controllers
             Inventory? inventory = await _context.Inventory
                 .Include(i => i.BorrowedBooks)
                 .FirstOrDefaultAsync(i => i.BookId == id);
- 
+
             CheckInventoryState(inventory, userId, out bool isAvailableForRent, out bool hasBorrowedBook);
             var viewModel = new BookDetailsViewModel
             {
@@ -334,6 +334,14 @@ namespace LibrarySystem.Controllers
 
             if (inventory != null)
             {
+                var borrowedBook = inventory.BorrowedBooks
+                    .FirstOrDefault(bb => bb.UserId == userId && bb.ReturnDate == null);
+
+                if (borrowedBook != null)
+                {
+                    borrowedBook.ReturnDate = DateTime.UtcNow;
+                    borrowedBook.Status = "Returned";
+                }
                 inventory.AvailableCopies += 1;
             }
 
