@@ -9,123 +9,12 @@
 	<title>@ViewData["Title"] - LibrarySystem</title>
 	<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
 	<link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-	<link rel="stylesheet" href="~/LibrarySystem.styles.css" asp-append-version="true" />
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.14.0-beta3/css/bootstrap-select.min.css" />
-	<link rel="stylesheet" href="~/css/library-custom.css" />
+	<link rel="stylesheet" href="~/css/library-custom.css?v=1.1" />
 	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
 	<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
 	<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-	<style>
-		body {
-			padding-top: 100px;
-		}
-
-		.navbar {
-			position: fixed;
-			top: 0;
-			left: 0;
-			right: 0;
-			z-index: 1030;
-			transition: all 0.3s ease;
-			background: rgba(255, 255, 255, 0.6);
-			backdrop-filter: blur(16px);
-			-webkit-backdrop-filter: blur(16px);
-			box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-			border-radius: 0 0 0.75rem 0.75rem;
-			padding: 0.75rem 1rem;
-		}
-
-			.navbar.shrink {
-				padding: 0.25rem 1rem;
-				box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-				backdrop-filter: blur(10px);
-				font-size: 0.9rem;
-			}
-
-		.navbar-brand {
-			font-weight: 700;
-			color: #B327B7 !important;
-			font-size: 1.5rem;
-			text-shadow: 0 0 5px rgba(179, 39, 183, 0.3);
-			transition: font-size 0.3s ease;
-		}
-
-		.navbar.shrink .navbar-brand {
-			font-size: 1.25rem;
-		}
-
-		.navbar-nav .nav-link {
-			color: #333;
-			font-weight: 500;
-			padding: 0.5rem 1rem;
-			border-radius: 0.5rem;
-			transition: all 0.3s ease;
-		}
-
-			.navbar-nav .nav-link:hover,
-			.dropdown-item:hover {
-				background-color: rgba(179, 39, 183, 0.1);
-				color: #B327B7;
-			}
-
-			.navbar-nav .nav-link.active,
-			.dropdown-item.active {
-				background-color: rgba(179, 39, 183, 0.2);
-				color: #B327B7 !important;
-				font-weight: 600;
-				box-shadow: inset 0 0 0 2px rgba(179, 39, 183, 0.3);
-			}
-
-		.navbar-toggler {
-			border: none;
-		}
-
-		.navbar-toggler-icon {
-			background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='%23666' viewBox='0 0 30 30'%3e%3cpath stroke='%23666' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
-		}
-
-		.nav-link.dropdown-toggle.active {
-			background-color: rgba(179, 39, 183, 0.2);
-			color: #B327B7 !important;
-			font-weight: 600;
-			box-shadow: inset 0 0 0 2px rgba(179, 39, 183, 0.3);
-			border-radius: 0.5rem;
-		}
-
-		/* Hover dropdown with smooth animation */
-		.nav-item.dropdown:hover .dropdown-menu {
-			display: block;
-			opacity: 1;
-			visibility: visible;
-			transform: translateY(0);
-			transition: opacity 0.3s ease, transform 0.3s ease;
-		}
-
-		.dropdown-menu {
-			display: block;
-			opacity: 0;
-			visibility: hidden;
-			transform: translateY(-10px); /* Start slightly above and move down */
-			transition: opacity 0.3s ease, transform 0.3s ease, visibility 0s linear 0.3s;
-			pointer-events: none;
-			margin-top: 0;
-			border-radius: 10px;
-			background-color: rgba(255, 255, 255, 0.95); /* More opaque white background */
-			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* Optional: for depth */
-		}
-
-		/* On hover */
-		.nav-item.dropdown:hover .dropdown-menu {
-			opacity: 1;
-			visibility: visible;
-			transform: translateY(0); /* Drop down into position */
-			pointer-events: auto;
-			transition-delay: 0s;
-		}
-
-
-	</style>
 </head>
 <body>
 	<header>
@@ -211,51 +100,10 @@
 
 	<script src="~/lib/jquery/dist/jquery.min.js"></script>
 	<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-	<script src="~/js/library-custom.js"></script>
+	<script src="~/js/library-custom.js" asp-append-version="true"></script>
 	<script src="~/js/site.js" asp-append-version="true"></script>
 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.14.0-beta3/js/bootstrap-select.min.js"></script>
-
-	<script>
-				document.addEventListener('DOMContentLoaded', function () {
-			const navbar = document.querySelector('.navbar');
-
-			window.addEventListener('scroll', () => {
-				if (window.scrollY > 50) {
-					navbar.classList.add('shrink');
-				} else {
-					navbar.classList.remove('shrink');
-				}
-			});
-
-			const currentPath = window.location.pathname.toLowerCase();
-
-			document.querySelectorAll('.navbar-nav .nav-link, .dropdown-item').forEach(link => {
-				const href = link.getAttribute('href');
-				if (!href) return;
-
-				const normalizedHref = href.toLowerCase();
-
-				// Special case for Home: match only exact "/"
-				if (normalizedHref === "/" && currentPath === "/") {
-					link.classList.add('active');
-					return;
-				}
-
-				// Match others if currentPath starts with href + slash or is exact match
-				if (normalizedHref !== "/" &&
-					(currentPath === normalizedHref || currentPath.startsWith(normalizedHref + "/"))) {
-					link.classList.add('active');
-
-					const parentDropdown = link.closest('.dropdown');
-					if (parentDropdown) {
-						const toggle = parentDropdown.querySelector('.nav-link.dropdown-toggle');
-						if (toggle) toggle.classList.add('active');
-					}
-				}
-			});
-		});
-	</script>
 
 	@await RenderSectionAsync("Scripts", required: false)
 </body>

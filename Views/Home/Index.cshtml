@@ -3,7 +3,7 @@
 	ViewData["Title"] = "Home";
 }
 
-<!-- Hero Section -->
+<!-- Hero Section -->	
 <section class="hero-section d-flex align-items-center">
 	<div class="hero-text-container">
 		<h1 class="display-3">Discover Your Next Favorite Book</h1>
@@ -16,7 +16,7 @@
 </section>
 
 <!-- About Section -->
-<section id="about" class="content-section bg-light text-center py-5 my-5">
+<section id="about" class="content-section-secondary bg-primary text-center py-5 my-5">
 	<div class="container my-5">
 		<h2 class="mb-4">About Our Library</h2>
 		<p class="lead">We provide access to a wide collection of books from various genres and authors. Our mission is to foster a love for reading and lifelong learning.</p>
@@ -24,24 +24,25 @@
 </section>
 
 <!-- Featured Books Section -->
-<section id="featured-books" class="content-section text-center py-5">
-	<div class="container">
+<section id="featured-books" class="content-section text-center py-5 overflow-hidden">
+	<div class="container-fluid">
 		<h2 class="mb-4 text-primary">Featured Books</h2>
-		<div class="d-flex flex-wrap justify-content-center">
-			@foreach (var book in Model.Books.Take(4)) // Show top 4
+
+		<div id="book-carousel" class="d-flex flex-nowrap overflow-hidden" style="white-space: nowrap;">
+			@foreach (var book in Model.Books.Take(4))
 			{
-				<div class="card m-3 shadow-sm" style="width: 13rem;">
+				<div class="book-card card shadow-sm mx-2 d-inline-block" style="width: 16rem; flex-shrink: 0;">
 					@if (book.Image != null)
 					{
 						<img src="data:image/jpeg;base64,@Convert.ToBase64String(book.Image)"
 							 class="card-img-top" alt="@book.Title"
-							 style="width: 100%; height: 25rem; object-fit: cover;" />
+							 style="width: 100%; height: 15rem; object-fit: cover;" />
 					}
 					else
 					{
 						<img src="/images/default-book-3.png"
 							 class="card-img-top" alt="No Image"
-							 style="width: 100%; height: 25rem; object-fit: cover;" />
+							 style="width: 100%; height: 15rem; object-fit: cover;" />
 					}
 					<div class="card-body">
 						<h5 class="card-title">@book.Title</h5>
@@ -53,11 +54,12 @@
 	</div>
 </section>
 
+
 <!-- Featured Authors Section -->
 <section id="featured-authors" class="content-section bg-light text-center py-5">
-	<div class="container">
+	<div class="container-fluid">
 		<h2 class="mb-4 text-primary">Featured Authors</h2>
-		<div class="d-flex flex-wrap justify-content-center">
+		<div class="d-flex flex-wrap justify-content-between">
 			@foreach (var author in Model.Authors.Take(4))
 			{
 				<div class="card m-3 shadow-sm" style="width: 13rem;">
@@ -65,13 +67,13 @@
 					{
 						<img src="data:image/jpeg;base64,@Convert.ToBase64String(author.Image)"
 							 class="card-img-top" alt="@author.Name"
-							 style="width: 100%; height: 25rem; object-fit: cover;" />
+							 style="width: 100%; height: 15rem; object-fit: cover;" />
 					}
 					else
 					{
 						<img src="/images/default-author.jpg"
 							 class="card-img-top" alt="No Image"
-							 style="width: 100%; height: 25rem; object-fit: cover;" />
+							 style="width: 100%; height: 15rem; object-fit: cover;" />
 					}
 					<div class="card-body">
 						<h5 class="card-title">@author.Name</h5>
@@ -122,6 +124,11 @@
 		transition: all 0.3s ease-in-out;
 	}
 
+	.content-section-secondary {
+		transition: all 0.3s ease-in-out;
+		background-color: var(--bs-secondary-background);
+	}
+
 	.truncate-3 {
 		display: -webkit-box;
 		-webkit-line-clamp: 3;
@@ -130,4 +137,53 @@
 		text-overflow: ellipsis;
 	}
 
+	.truncate-3 {
+		display: -webkit-box;
+		-webkit-line-clamp: 3;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
 </style>
+
+<script>
+	document.addEventListener("DOMContentLoaded", () => {
+		const carousel = document.getElementById("book-carousel");
+		const cards = carousel.querySelectorAll('.book-card');
+
+		// Clone cards for seamless loop
+		cards.forEach(card => {
+			const clone = card.cloneNode(true);
+			carousel.appendChild(clone);
+		});
+
+		const cardWidth = cards[0].offsetWidth + 16; // 16px = margin (adjust if needed)
+		let currentScroll = 0;
+
+		function scrollStep() {
+			currentScroll += cardWidth;
+
+			// Reset if halfway through the carousel (original + cloned)
+			if (currentScroll >= carousel.scrollWidth / 2) {
+				carousel.scrollLeft = 0;
+				currentScroll = cardWidth;
+			}
+
+			carousel.scrollTo({
+				left: currentScroll,
+				behavior: "smooth"
+			});
+		}
+
+		let interval = setInterval(scrollStep, 2000); // every 2 seconds
+
+		// Optional: pause on hover
+		carousel.addEventListener("mouseenter", () => clearInterval(interval));
+		carousel.addEventListener("mouseleave", () => {
+			interval = setInterval(scrollStep, 2000);
+		});
+	});
+</script>
+
+
+
