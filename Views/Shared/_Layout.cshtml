@@ -14,10 +14,11 @@
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.14.0-beta3/css/bootstrap-select.min.css" />
 	<link rel="stylesheet" href="~/css/library-custom.css" />
 	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+	<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 	<style>
 		body {
-			font-family: 'Inter', sans-serif;
-			padding-top: 100px; /* Space for fixed navbar */
+			padding-top: 100px;
 		}
 
 		.navbar {
@@ -62,12 +63,14 @@
 			transition: all 0.3s ease;
 		}
 
-			.navbar-nav .nav-link:hover {
+			.navbar-nav .nav-link:hover,
+			.dropdown-item:hover {
 				background-color: rgba(179, 39, 183, 0.1);
 				color: #B327B7;
 			}
 
-			.navbar-nav .nav-link.active {
+			.navbar-nav .nav-link.active,
+			.dropdown-item.active {
 				background-color: rgba(179, 39, 183, 0.2);
 				color: #B327B7 !important;
 				font-weight: 600;
@@ -81,6 +84,47 @@
 		.navbar-toggler-icon {
 			background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='%23666' viewBox='0 0 30 30'%3e%3cpath stroke='%23666' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
 		}
+
+		.nav-link.dropdown-toggle.active {
+			background-color: rgba(179, 39, 183, 0.2);
+			color: #B327B7 !important;
+			font-weight: 600;
+			box-shadow: inset 0 0 0 2px rgba(179, 39, 183, 0.3);
+			border-radius: 0.5rem;
+		}
+
+		/* Hover dropdown with smooth animation */
+		.nav-item.dropdown:hover .dropdown-menu {
+			display: block;
+			opacity: 1;
+			visibility: visible;
+			transform: translateY(0);
+			transition: opacity 0.3s ease, transform 0.3s ease;
+		}
+
+		.dropdown-menu {
+			display: block;
+			opacity: 0;
+			visibility: hidden;
+			transform: translateY(-10px); /* Start slightly above and move down */
+			transition: opacity 0.3s ease, transform 0.3s ease, visibility 0s linear 0.3s;
+			pointer-events: none;
+			margin-top: 0;
+			border-radius: 10px;
+			background-color: rgba(255, 255, 255, 0.95); /* More opaque white background */
+			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* Optional: for depth */
+		}
+
+		/* On hover */
+		.nav-item.dropdown:hover .dropdown-menu {
+			opacity: 1;
+			visibility: visible;
+			transform: translateY(0); /* Drop down into position */
+			pointer-events: auto;
+			transition-delay: 0s;
+		}
+
+
 	</style>
 </head>
 <body>
@@ -94,24 +138,25 @@
 				</button>
 				<div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
 					<ul class="navbar-nav me-auto">
-						<li class="nav-item">
-							<a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-						</li>
-						<li class="nav-item">
-							<a class="nav-link" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-						</li>
-						<li class="nav-item">
-							<a class="nav-link" asp-area="" asp-controller="Home" asp-action="Discover">Discover</a>
-						</li>
+						<li class="nav-item"><a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
+						<li class="nav-item"><a class="nav-link" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a></li>
+						<li class="nav-item"><a class="nav-link" asp-area="" asp-controller="Home" asp-action="Discover">Discover</a></li>
 
 						@if (isAuthenticated)
 						{
-							<li class="nav-item"><a class="nav-link" asp-controller="Books" asp-action="Index">Books</a></li>
-							<li class="nav-item"><a class="nav-link" asp-controller="Authors" asp-action="Index">Authors</a></li>
-							<li class="nav-item"><a class="nav-link" asp-controller="Users" asp-action="Index">Users</a></li>
-							<li class="nav-item"><a class="nav-link" asp-controller="Roles" asp-action="Index">Roles</a></li>
-							<li class="nav-item"><a class="nav-link" asp-controller="Genres" asp-action="Index">Genres</a></li>
-							<li class="nav-item"><a class="nav-link" asp-controller="Inventories" asp-action="Index">Inventories</a></li>
+							<li class="nav-item dropdown">
+								<a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" aria-expanded="false">
+									Admin
+								</a>
+								<ul class="dropdown-menu" aria-labelledby="adminDropdown">
+									<li><a class="dropdown-item" asp-controller="Books" asp-action="Index">Books</a></li>
+									<li><a class="dropdown-item" asp-controller="Authors" asp-action="Index">Authors</a></li>
+									<li><a class="dropdown-item" asp-controller="Users" asp-action="Index">Users</a></li>
+									<li><a class="dropdown-item" asp-controller="Roles" asp-action="Index">Roles</a></li>
+									<li><a class="dropdown-item" asp-controller="Genres" asp-action="Index">Genres</a></li>
+									<li><a class="dropdown-item" asp-controller="Inventories" asp-action="Index">Inventories</a></li>
+								</ul>
+							</li>
 						}
 					</ul>
 
@@ -132,25 +177,29 @@
 							<li class="nav-item"><a class="nav-link" asp-controller="Auth" asp-action="Login">Login</a></li>
 						}
 					</ul>
-
 				</div>
 			</div>
 		</nav>
 	</header>
 
-	<div class="container">
+	<div class="container-fluid">
 		<main role="main" class="pb-3">
 			@if (TempData["Error"] != null)
 			{
 				<div class="alert alert-danger">@TempData["Error"]</div>
 			}
-
 			@if (TempData["Success"] != null)
 			{
 				<div class="alert alert-success">@TempData["Success"]</div>
 			}
-
-			@RenderBody()
+			@if (IsSectionDefined("SubContent"))
+			{
+				@RenderSection("SubContent", required: false)
+			}
+			else
+			{
+				@RenderBody()
+			}
 		</main>
 	</div>
 
@@ -168,7 +217,7 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.14.0-beta3/js/bootstrap-select.min.js"></script>
 
 	<script>
-		document.addEventListener('DOMContentLoaded', function () {
+				document.addEventListener('DOMContentLoaded', function () {
 			const navbar = document.querySelector('.navbar');
 
 			window.addEventListener('scroll', () => {
@@ -179,13 +228,30 @@
 				}
 			});
 
-			// Set active nav link
 			const currentPath = window.location.pathname.toLowerCase();
-			document.querySelectorAll('.navbar-nav .nav-link').forEach(link => {
-				const linkPath = link.getAttribute('href')?.toLowerCase();
-				if (linkPath && currentPath.startsWith(linkPath)) {
-					document.querySelectorAll('.navbar-nav .nav-link').forEach(l => l.classList.remove('active'));
+
+			document.querySelectorAll('.navbar-nav .nav-link, .dropdown-item').forEach(link => {
+				const href = link.getAttribute('href');
+				if (!href) return;
+
+				const normalizedHref = href.toLowerCase();
+
+				// Special case for Home: match only exact "/"
+				if (normalizedHref === "/" && currentPath === "/") {
 					link.classList.add('active');
+					return;
+				}
+
+				// Match others if currentPath starts with href + slash or is exact match
+				if (normalizedHref !== "/" &&
+					(currentPath === normalizedHref || currentPath.startsWith(normalizedHref + "/"))) {
+					link.classList.add('active');
+
+					const parentDropdown = link.closest('.dropdown');
+					if (parentDropdown) {
+						const toggle = parentDropdown.querySelector('.nav-link.dropdown-toggle');
+						if (toggle) toggle.classList.add('active');
+					}
 				}
 			});
 		});

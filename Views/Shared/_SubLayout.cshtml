@@ -1,0 +1,39 @@
+﻿@{
+    Layout = "_Layout"; // Use main layout (optional if already nested)
+}
+
+@section SubContent {
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 mb-4">
+            <div class="card shadow-sm border-0 sidebar-container">
+                <div class="card-body p-3">
+                    <h5 class="card-title text-uppercase fw-bold text-center text-primary mb-3" style="color: #B327B7;">Dashboard</h5>
+                    <div class="list-group list-group-flush">
+                        <a class="list-group-item list-group-item-action sidebar-link" asp-controller="Books" asp-action="Index">
+                            <i class="bi bi-book me-2"></i> Manage Books
+                        </a>
+                        <a class="list-group-item list-group-item-action sidebar-link" asp-controller="Authors" asp-action="Index">
+                            <i class="bi bi-person-lines-fill me-2"></i> Manage Authors
+                        </a>
+                        <a class="list-group-item list-group-item-action sidebar-link" asp-controller="Genres" asp-action="Index">
+                            <i class="bi bi-tags me-2"></i> Manage Genres
+                        </a>
+                        <a class="list-group-item list-group-item-action sidebar-link" asp-controller="Inventories" asp-action="Index">
+                            <i class="bi bi-boxes me-2"></i> Inventories
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-9">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    @RenderBody() <!-- ✅ REQUIRED -->
+                </div>
+            </div>
+        </div>
+    </div>
+}
