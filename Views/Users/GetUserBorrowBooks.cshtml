@@ -1,13 +1,13 @@
 ﻿@model LibrarySystem.Models.UserInformationViewModel
 
-<div class="container-fluid mt-2 pt-5">
+<div class="container-fluid my-5">
 	@if (Model?.BorrowedBooks == null || !Model.BorrowedBooks.Any())
 	{
-		<p>No borrowed books found.</p>
+		<h1 class="mb-4 text-primary">No borrowed books found.</h1>
 	}
 	else
 	{
-		<h2>Borrowing History for @Model.User.Name</h2>
+		<h1 class="mb-4 text-primary">Borrowing History for @Model.User.Name</h1>
 
 		<table class="table table-bordered table-hover">
 			<thead class="thead-dark">

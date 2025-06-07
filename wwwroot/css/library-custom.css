@@ -1,6 +1,7 @@
 ﻿:root {
     /* Base Colors */
-    --bs-primary: #4DD0E1; /* Slightly deeper cyan-teal */
+    /*--bs-primary: #4DD0E1;*/ /* Slightly deeper cyan-teal */
+    --bs-primary: #148087; /* Slightly deeper cyan-teal */
     --bs-primary-hover: #26C6DA; /* Stronger hover */
     --bs-primary-active: #0097A7; /* Darker active */
     --bs-primary-text: #FFFFFF; /* White text */
@@ -22,6 +23,11 @@
     --bs-navbar-shadow: rgba(0, 151, 167, 0.1); /* subtle teal shadow */
 
     --bs-dropdown-bg: #FFFFFF; /* clean white dropdown */
+}
+
+.text-primary
+{
+    color: var(--bs-primary) !important;
 }
 
 /* Primary Button */

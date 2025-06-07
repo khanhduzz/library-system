@@ -26,7 +26,7 @@
 <!-- Featured Books Section -->
 <section id="featured-books" class="content-section text-center py-5">
 	<div class="container">
-		<h2 class="mb-5">New Books</h2>
+		<h2 class="mb-5 text-primary">New Books</h2>
 		<div class="row justify-content-center g-4">
 			@foreach (var book in Model.Books.OrderBy(b => Guid.NewGuid()).Take(4))
 			{
@@ -54,6 +54,31 @@
 	</div>
 </section>
 
+<!-- Benefits Section -->
+<section id="why-library" class="content-section bg-primary text-white text-center py-5">
+	<div class="container">
+		<h2 class="mb-4">Why Use Our Library System?</h2>
+		<p class="lead mb-5">Discover the advantages of using our digital platform designed for readers, students, and lifelong learners.</p>
+		<div class="row justify-content-center g-4">
+			<div class="col-md-4" data-aos="fade-up">
+				<i class="bi bi-clock-history" style="font-size: 3rem;"></i>
+				<h5 class="fw-bold mt-3">24/7 Access</h5>
+				<p class="text-white-50">Borrow and read books anytime, anywhere—no need to wait for opening hours.</p>
+			</div>
+			<div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
+				<i class="bi bi-person-lines-fill" style="font-size: 3rem;"></i>
+				<h5 class="fw-bold mt-3">Personalized Dashboard</h5>
+				<p class="text-white-50">Track your borrow history, manage your returns, and explore book suggestions tailored to your interests.</p>
+			</div>
+			<div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+				<i class="bi bi-phone" style="font-size: 3rem;"></i>
+				<h5 class="fw-bold mt-3">Multi-Device Friendly</h5>
+				<p class="text-white-50">Access the library on your desktop, tablet, or mobile device—seamlessly and securely.</p>
+			</div>
+		</div>
+	</div>
+</section>
+
 <section id="featured-authors" class="content-section bg-light text-center py-5">
 	<div class="container">
 		<h2 class="mb-4 text-primary">Popular Authors</h2>
@@ -75,6 +100,112 @@
 					</div>
 				</div>
 			}
+		</div>
+	</div>
+</section>
+
+<!-- Borrowing Instructions Section -->
+<section id="how-it-works" class="content-section text-center py-5">
+	<div class="container">
+		<h2 class="mb-4 text-primary">How to Borrow & Return Books</h2>
+		<p class="lead mb-5">Our digital library system makes it easy to borrow and return books online. Follow the simple steps below to get started.</p>
+		<div class="row justify-content-center g-5">
+			<div class="col-md-4" data-aos="fade-up">
+				<i class="bi bi-person-circle text-primary" style="font-size: 4rem;"></i>
+				<h5 class="fw-bold mt-3">1. Register / Log In</h5>
+				<p class="text-muted">Create an account or log in to access the library's online services.</p>
+			</div>
+			<div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
+				<i class="bi bi-journal-bookmark-fill text-primary" style="font-size: 4rem;"></i>
+				<h5 class="fw-bold mt-3">2. Browse & Borrow</h5>
+				<p class="text-muted">Explore our collection, view details, and click "Borrow" to check out a book.</p>
+			</div>
+			<div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+				<i class="bi bi-arrow-return-left text-primary" style="font-size: 4rem;"></i>
+				<h5 class="fw-bold mt-3">3. Return Online</h5>
+				<p class="text-muted">Visit your profile to return books online once you're done reading.</p>
+			</div>
+		</div>
+	</div>
+</section>
+
+<!-- Testimonials Section -->
+<section id="testimonials" class="content-section bg-light text-center py-5">
+	<div class="container">
+		<h2 class="mb-4 text-primary">What Our Users Say</h2>
+		<div class="row justify-content-center g-4">
+			<div class="col-md-4" data-aos="fade-up">
+				<div class="card shadow-sm h-100">
+					<div class="card-body">
+						<i class="bi bi-chat-quote-fill text-primary" style="font-size: 2rem;"></i>
+						<p class="card-text mt-3">"An amazing platform! I can borrow books without even stepping out of my house. Super convenient for my busy schedule."</p>
+						<h6 class="fw-bold mt-3">– Ayesha K., University Student</h6>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
+				<div class="card shadow-sm h-100">
+					<div class="card-body">
+						<i class="bi bi-chat-quote-fill text-primary" style="font-size: 2rem;"></i>
+						<p class="card-text mt-3">"The online return process is seamless and the book recommendations are always on point."</p>
+						<h6 class="fw-bold mt-3">– Jamal R., Educator</h6>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+				<div class="card shadow-sm h-100">
+					<div class="card-body">
+						<i class="bi bi-chat-quote-fill text-primary" style="font-size: 2rem;"></i>
+						<p class="card-text mt-3">"Fantastic system! I use it on my phone daily to explore new books during my commute."</p>
+						<h6 class="fw-bold mt-3">– Fatima L., Book Lover</h6>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+<!-- FAQ Section -->
+<section id="faq" class="content-section text-center py-5">
+	<div class="container">
+		<h2 class="mb-4 text-primary">Frequently Asked Questions</h2>
+		<div class="accordion accordion-flush text-start mx-auto" id="faqAccordion" style="max-width: 800px;">
+			<div class="accordion-item">
+				<h2 class="accordion-header" id="faqHeadingOne">
+					<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapseOne" aria-expanded="false" aria-controls="faqCollapseOne">
+						How do I borrow a book?
+					</button>
+				</h2>
+				<div id="faqCollapseOne" class="accordion-collapse collapse" aria-labelledby="faqHeadingOne" data-bs-parent="#faqAccordion">
+					<div class="accordion-body">
+						Log in to your account, navigate to the book you want, and click the "Borrow" button. The book will then appear in your profile.
+					</div>
+				</div>
+			</div>
+			<div class="accordion-item">
+				<h2 class="accordion-header" id="faqHeadingTwo">
+					<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapseTwo" aria-expanded="false" aria-controls="faqCollapseTwo">
+						Can I return a book early?
+					</button>
+				</h2>
+				<div id="faqCollapseTwo" class="accordion-collapse collapse" aria-labelledby="faqHeadingTwo" data-bs-parent="#faqAccordion">
+					<div class="accordion-body">
+						Yes, you can return any borrowed book from your profile dashboard at any time before the due date.
+					</div>
+				</div>
+			</div>
+			<div class="accordion-item">
+				<h2 class="accordion-header" id="faqHeadingThree">
+					<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapseThree" aria-expanded="false" aria-controls="faqCollapseThree">
+						What if I forget to return a book?
+					</button>
+				</h2>
+				<div id="faqCollapseThree" class="accordion-collapse collapse" aria-labelledby="faqHeadingThree" data-bs-parent="#faqAccordion">
+					<div class="accordion-body">
+						Don't worry! We'll send you a reminder. You may lose borrowing privileges temporarily until the book is returned.
+					</div>
+				</div>
+			</div>
 		</div>
 	</div>
 </section>
