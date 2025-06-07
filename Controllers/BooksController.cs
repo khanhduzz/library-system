@@ -64,6 +64,11 @@ namespace LibrarySystem.Controllers
                 IsAvailableForRent = isAvailableForRent,
             };
 
+            viewModel.SuggestedBooks = _context.Book
+                .Where(b => b.AuthorId == viewModel.Book.AuthorId && b.Id != viewModel.Book.Id)
+                .Take(3)
+                .ToList();
+
             return View(viewModel);
         }
 

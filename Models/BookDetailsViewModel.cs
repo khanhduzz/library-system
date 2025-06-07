@@ -5,5 +5,6 @@
         public Book Book { get; set; }
         public bool IsBorrowedByUser { get; set; }
         public bool IsAvailableForRent {  get; set; }
+        public List<Book> SuggestedBooks { get; set; } = new();
     }
 }

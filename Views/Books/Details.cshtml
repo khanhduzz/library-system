@@ -4,48 +4,55 @@
     ViewData["Title"] = "Book Details";
 }
 
-<div class="container mt-4 p-4 rounded shadow-sm" style="background-color: #f8f9fa;">
-    <h1 class="mb-4">Book Details</h1>
+<div class="container my-5">
+    <!-- Header Row -->
+    <div class="d-flex justify-content-between align-items-start mb-4">
+        <h1 class="text-primary">@Model.Book.Title</h1>
+        @if (User.Identity.IsAuthenticated)
+        {
+            if (Model.IsBorrowedByUser)
+            {
+                <form method="post" asp-action="Return" asp-controller="Books" class="d-inline">
+                    <input type="hidden" name="bookId" value="@Model.Book.Id" />
+                    <button type="submit" class="btn btn-warning btn-sm">Return</button>
+                </form>
+            }
+            else if (Model.IsAvailableForRent)
+            {
+                <form method="post" asp-action="Borrow" asp-controller="Books" class="d-inline">
+                    <input type="hidden" name="bookId" value="@Model.Book.Id" />
+                    <button type="submit" class="btn btn-danger btn-sm">Borrow</button>
+                </form>
+            }
+            else
+            {
+                <span class="text-muted">Not available</span>
+            }
+        }
+    </div>
 
-    <div class="row" style="min-height: 400px;">
-        <!-- Left Side: Book Info -->
-        <div class="col-md-7 d-flex flex-column justify-content-between">
-            <div>
+    <div class="row">
+        <!-- Left Panel: Book Info -->
+        <div class="col-lg-8">
+            <div class="bg-light p-4 rounded shadow-sm">
+                <h4 class="mb-3">Book Information</h4>
                 <dl class="row">
-                    <dt class="col-sm-4">
-                        @Html.DisplayNameFor(model => model.Book.Title)
-                    </dt>
-                    <dd class="col-sm-8">
-                        @Html.DisplayFor(model => model.Book.Title)
-                    </dd>
+                    <dt class="col-sm-3">Title</dt>
+                    <dd class="col-sm-9">@Model.Book.Title</dd>
 
-                    <dt class="col-sm-4">
-                        @Html.DisplayNameFor(model => model.Book.Description)
-                    </dt>
-                    <dd class="col-sm-8">
-                        @Html.DisplayFor(model => model.Book.Description)
-                    </dd>
+                    <dt class="col-sm-3">Description</dt>
+                    <dd class="col-sm-9">@Model.Book.Description</dd>
 
-                    <dt class="col-sm-4">
-                        Author
-                    </dt>
-                    <dd class="col-sm-8">
-                        @Model.Book.Author?.Name
-                    </dd>
+                    <dt class="col-sm-3">Author</dt>
+                    <dd class="col-sm-9">@Model.Book.Author?.Name</dd>
 
-                    <dt class="col-sm-4">
-                        Genres
-                    </dt>
-                    <dd class="col-sm-8">
+                    <dt class="col-sm-3">Genres</dt>
+                    <dd class="col-sm-9">
                         @if (Model.Book.BookGenres.Any())
                         {
                             @foreach (var genre in Model.Book.BookGenres)
                             {
-                                <span>@genre.Genre.Name</span>
-                                @if (!ReferenceEquals(genre, Model.Book.BookGenres.Last()))
-                                {
-                                    <span>, </span> <!-- Add comma if it's not the last genre -->
-                                }
+                                <span class="badge bg-secondary me-1">@genre.Genre.Name</span>
                             }
                         }
                         else
@@ -54,83 +61,227 @@
                         }
                     </dd>
 
-                    <dt class="col-sm-4">
-                        @Html.DisplayNameFor(model => model.Book.ISBN)
-                    </dt>
-                    <dd class="col-sm-8">
-                        @Html.DisplayFor(model => model.Book.ISBN)
-                    </dd>
+                    <dt class="col-sm-3">ISBN</dt>
+                    <dd class="col-sm-9">@Model.Book.ISBN</dd>
 
-                    <dt class="col-sm-4">
-                        @Html.DisplayNameFor(model => model.Book.PublishDate)
-                    </dt>
-                    <dd class="col-sm-8">
-                        @Model.Book.PublishDate?.ToString("yyyy-MM-dd")
-                    </dd>
+                    <dt class="col-sm-3">Published</dt>
+                    <dd class="col-sm-9">@Model.Book.PublishDate?.ToString("yyyy-MM-dd")</dd>
 
-                    @* <dt class="col-sm-4">
-                        Available for Rent
-                    </dt>
-                    <dd class="col-sm-8">
-                        @(Model.Book.IsAvailable ? "Yes" : "No")
-                    </dd>
-
-                    <dt class="col-sm-4">
-                        @Html.DisplayNameFor(model => model.Book.Condition)
-                    </dt>
-                    <dd class="col-sm-8">
-                        @Model.Book.Condition.ToString()
-                    </dd>
-
-                    <dt class="col-sm-4">
-                        Borrow Count
-                    </dt>
-                    <dd class="col-sm-8">
-                        @Model.Book.BorrowCount
-                    </dd> *@
+                    @* <dt class="col-sm-3">Borrowed</dt> *@
+                    @* <dd class="col-sm-9">@Model.Book.BorrowCount times</dd> *@
                 </dl>
+
+                <div class="mt-4 d-flex gap-2">
+                    <a asp-action="Edit" asp-route-id="@Model.Book.Id" class="btn btn-outline-primary">Edit</a>
+                    <a asp-action="Index" class="btn btn-outline-secondary">Back to List</a>
+                    <button class="btn btn-outline-info">Add to Favorites</button>
+                    <button class="btn btn-outline-success">Share</button>
+                </div>
             </div>
 
-            <!-- Buttons at the very bottom -->
-            <div class="d-flex gap-2 pt-3">
-                <a asp-action="Edit" asp-route-id="@Model?.Book.Id" class="btn btn-primary">Edit</a>
-                @if (User.Identity.IsAuthenticated)
-                {
-                    @if (Model.IsBorrowedByUser)
-                    {
-                        <form method="post" asp-action="Return" asp-controller="Books">
-                            <input type="hidden" name="bookId" value="@Model.Book.Id" />
-                            <button type="submit" class="btn btn-warning">Return</button>
-                        </form>
-                    }
-                    else if (Model.IsAvailableForRent)
-                    {
-                        <form method="post" asp-action="Borrow" asp-controller="Books">
-                            <input type="hidden" name="bookId" value="@Model.Book.Id" />
-                            <button type="submit" class="btn btn-danger">Borrow</button>
-                        </form>
-                    }
-                    else
-                    {
-                        <span class="text-muted">Not available</span>
-                    }
-                }
-                <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+            <!-- Reviews Section -->
+            <div class="bg-white p-4 rounded shadow-sm mt-4">
+                <h5 class="mb-3">User Reviews</h5>
+                <p class="text-muted">No reviews yet. Be the first to review this book!</p>
+                <form>
+                    <div class="mb-2">
+                        <textarea class="form-control" rows="3" placeholder="Write your review..."></textarea>
+                    </div>
+                    <button class="btn btn-sm btn-primary" type="submit">Submit Review</button>
+                </form>
             </div>
         </div>
 
-        <!-- Right Side: Image Display -->
-        <div class="col-md-5 d-flex align-items-center justify-content-center">
-            @if (Model.Book.Image != null)
+        <!-- Right Panel: Book Image & Status -->
+        <div class="col-lg-4">
+            <div class="bg-white p-3 shadow-sm rounded mb-4 text-center">
+                @if (Model.Book.Image != null)
+                {
+                    <img src="data:image/jpeg;base64,@Convert.ToBase64String(Model.Book.Image)"
+                         class="rounded img-fluid mb-3"
+                         style="max-height: 350px; object-fit: contain;" />
+                }
+                else
+                {
+                    <div class="text-muted mb-3">No image available</div>
+                }
+
+                <div>
+                    <span class="badge @((Model.IsAvailableForRent ? "bg-success" : "bg-danger"))">
+                        @(Model.IsAvailableForRent ? "Available" : "Not Available")
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Suggested Books -->
+    @if (Model.SuggestedBooks?.Any() == true)
+    {
+        <div class="mt-5">
+            <h4 class="mb-3">You May Also Like</h4>
+            <div class="row row-cols-1 row-cols-md-4 g-4">
+                @foreach (var suggestion in Model.SuggestedBooks)
+                {
+                    <div class="col">
+                        <div class="card h-100 shadow-sm">
+                            @if (suggestion.Image != null)
+                            {
+                                <img src="data:image/jpeg;base64,@Convert.ToBase64String(suggestion.Image)"
+                                     class="card-img-top"
+                                     style="max-height: 180px; object-fit: cover;" />
+                            }
+                            else
+                            {
+                                <div class="card-img-top bg-light text-center py-5 text-muted">No Image</div>
+                            }
+                            <div class="card-body">
+                                <h5 class="card-title">@suggestion.Title</h5>
+                                <p class="card-text small text-muted">
+                                    @(suggestion.Description?.Length > 100 ? suggestion.Description.Substring(0, 100) + "..." : suggestion.Description)
+                                </p>
+                                <a asp-action="Details" asp-route-id="@suggestion.Id" class="btn btn-sm btn-outline-primary">View Details</a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+
+
+
+@* @model LibrarySystem.Models.BookDetailsViewModel
+
+@{
+    ViewData["Title"] = "Book Details";
+}
+
+<div class="container my-5">
+    <!-- Header Row -->
+    <div class="d-flex justify-content-between align-items-start mb-4">
+        <h1 class="text-primary">@Model.Book.Title</h1>
+        @if (User.Identity.IsAuthenticated)
+        {
+            if (Model.IsBorrowedByUser)
             {
-                <img src="data:image/jpeg;base64,@Convert.ToBase64String(Model.Book.Image)"
-                     class="rounded shadow img-fluid"
-                     style="height: 400px; width: auto;" />
+                <form method="post" asp-action="Return" asp-controller="Books" class="d-inline">
+                    <input type="hidden" name="bookId" value="@Model.Book.Id" />
+                    <button type="submit" class="btn btn-warning btn-sm">Return</button>
+                </form>
+            }
+            else if (Model.IsAvailableForRent)
+            {
+                <form method="post" asp-action="Borrow" asp-controller="Books" class="d-inline">
+                    <input type="hidden" name="bookId" value="@Model.Book.Id" />
+                    <button type="submit" class="btn btn-danger btn-sm">Borrow</button>
+                </form>
             }
             else
             {
-                <p class="text-muted">No image available</p>
+                <span class="text-muted">Not available</span>
             }
+        }
+    </div>
+
+    <div class="row">
+        <!-- Left Panel: Book Info -->
+        <div class="col-lg-8">
+            <div class="bg-light p-4 rounded shadow-sm">
+                <h4 class="mb-3">Book Information</h4>
+                <dl class="row">
+                    <dt class="col-sm-3">Title</dt>
+                    <dd class="col-sm-9">@Model.Book.Title</dd>
+
+                    <dt class="col-sm-3">Description</dt>
+                    <dd class="col-sm-9">@Model.Book.Description</dd>
+
+                    <dt class="col-sm-3">Author</dt>
+                    <dd class="col-sm-9">@Model.Book.Author?.Name</dd>
+
+                    <dt class="col-sm-3">Genres</dt>
+                    <dd class="col-sm-9">
+                        @if (Model.Book.BookGenres.Any())
+                        {
+                            @foreach (var genre in Model.Book.BookGenres)
+                            {
+                                <span class="badge bg-secondary me-1">@genre.Genre.Name</span>
+                            }
+                        }
+                        else
+                        {
+                            <span class="text-muted">No genres available</span>
+                        }
+                    </dd>
+
+                    <dt class="col-sm-3">ISBN</dt>
+                    <dd class="col-sm-9">@Model.Book.ISBN</dd>
+
+                    <dt class="col-sm-3">Published</dt>
+                    <dd class="col-sm-9">@Model.Book.PublishDate?.ToString("yyyy-MM-dd")</dd>
+                </dl>
+
+                <div class="mt-4">
+                    <a asp-action="Edit" asp-route-id="@Model.Book.Id" class="btn btn-outline-primary me-2">Edit</a>
+                    <a asp-action="Index" class="btn btn-outline-secondary">Back to List</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel: Book Image & Status -->
+        <div class="col-lg-4">
+            <div class="bg-white p-3 shadow-sm rounded mb-4 text-center">
+                @if (Model.Book.Image != null)
+                {
+                    <img src="data:image/jpeg;base64,@Convert.ToBase64String(Model.Book.Image)"
+                         class="rounded img-fluid mb-3"
+                         style="max-height: 350px;" />
+                }
+                else
+                {
+                    <div class="text-muted mb-3">No image available</div>
+                }
+
+                <div>
+                    <span class="badge @((Model.IsAvailableForRent ? "bg-success" : "bg-danger"))">
+                        @(Model.IsAvailableForRent ? "Available" : "Not Available")
+                    </span>
+                </div>
+            </div>
         </div>
     </div>
-</div>
+
+    <!-- Suggested Books -->
+    @if (Model.SuggestedBooks?.Any() == true)
+    {
+        <div class="mt-5">
+            <h4 class="mb-3">You May Also Like</h4>
+            <div class="row row-cols-1 row-cols-md-3 g-4">
+                @foreach (var suggestion in Model.SuggestedBooks)
+                {
+                    <div class="col">
+                        <div class="card h-100 shadow-sm">
+                            @if (suggestion.Image != null)
+                            {
+                                <img src="data:image/jpeg;base64,@Convert.ToBase64String(suggestion.Image)"
+                                     class="card-img-top"
+                                     style="max-height: 180px; object-fit: cover;" />
+                            }
+                            else
+                            {
+                                <div class="card-img-top bg-light text-center py-5 text-muted">No Image</div>
+                            }
+                            <div class="card-body">
+                                <h5 class="card-title">@suggestion.Title</h5>
+                                <p class="card-text small text-muted">@suggestion.Description?.Substring(0, Math.Min(100, suggestion.Description.Length))...</p>
+                                <a asp-action="Details" asp-route-id="@suggestion.Id" class="btn btn-sm btn-outline-primary">View Details</a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div> *@
