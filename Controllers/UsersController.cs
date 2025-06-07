@@ -167,7 +167,7 @@ namespace LibrarySystem.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetUserBorrowBooks (int? id)
+        public async Task<IActionResult> GetUserBorrowBooks(int? id)
         {
             if (id == null)
             {
@@ -183,7 +183,9 @@ namespace LibrarySystem.Controllers
 
             var borrowBooks = await _context.BorrowedBook
                 .Where(m => m.UserId == id)
-                //.Include(m => m.Book)
+                .Include(m => m.Inventory)
+                    .ThenInclude(i => i.Book)
+                .OrderByDescending(m => m.BorrowDate)
                 .ToListAsync();
 
             var model = new UserInformationViewModel
@@ -194,5 +196,6 @@ namespace LibrarySystem.Controllers
 
             return View(model);
         }
+
     }
 }

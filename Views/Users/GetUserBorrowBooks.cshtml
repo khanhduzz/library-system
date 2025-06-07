@@ -1,42 +1,61 @@
-﻿@* @model LibrarySystem.Models.UserInformationViewModel
+﻿@model LibrarySystem.Models.UserInformationViewModel
 
-<div>
-    <h2>@Model.User.Name's Borrowed Books</h2>
+<div class="container-fluid mt-2 pt-5">
+	@if (Model?.BorrowedBooks == null || !Model.BorrowedBooks.Any())
+	{
+		<p>No borrowed books found.</p>
+	}
+	else
+	{
+		<h2>Borrowing History for @Model.User.Name</h2>
 
-    @if (Model.BorrowedBooks.Any())
-    {
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Book Title</th>
-                    <th>Borrow Date</th>
-                    <th>Return Date</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var borrowedBook in Model.BorrowedBooks)
-                {
-                    <tr>
-                        <td>@borrowedBook.Book.Title</td>
-                        <td>@borrowedBook.BorrowDate.ToShortDateString()</td>
-                        <td>
-                            @if (borrowedBook.ReturnDate.HasValue)
-                            {
-                                @borrowedBook.ReturnDate.Value.ToShortDateString()
-                            }
-                            else
-                            {
-                                <span>Not Returned</span>
-                            }
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    }
-    else
-    {
-        <p>@Model.User.Name has not borrowed any books.</p>
-    }
+		<table class="table table-bordered table-hover">
+			<thead class="thead-dark">
+				<tr>
+					<th>Title</th>
+					<th>Status</th>
+					<th>Return Date</th>
+					<th>Action</th>
+				</tr>
+			</thead>
+			<tbody>
+				@{
+					var rowId = 0;
+				}
+				@foreach (var item in Model.BorrowedBooks)
+				{
+					var isReturned = item.ReturnDate != null;
+					string collapseId = $"collapseRow{rowId++}";
+					<tr data-bs-toggle="collapse" data-bs-target="#@collapseId" aria-expanded="false" aria-controls="@collapseId" style="cursor:pointer;">
+						<td>@item.Inventory?.Book?.Title</td>
+						<td>
+							@if (isReturned)
+							{
+								<span class="badge bg-success">Returned</span>
+							}
+							else
+							{
+								<span class="badge bg-warning text-dark">Not Returned</span>
+							}
+						</td>
+						<td>@(item.ReturnDate?.ToShortDateString() ?? "-")</td>
+						<td><i class="bi bi-chevron-down"></i></td>
+					</tr>
+					<tr id="@collapseId" class="collapse bg-light">
+						<td colspan="4">
+							<strong>Borrowed On:</strong> @item.BorrowDate.ToShortDateString()<br />
+							@if (isReturned)
+							{
+								<strong>Returned On:</strong> @item.ReturnDate?.ToShortDateString()
+							}
+							else
+							{
+								<strong>Status: Not return</strong>
+							}
+						</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+	}
 </div>
- *@
