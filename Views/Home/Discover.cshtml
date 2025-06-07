@@ -5,11 +5,11 @@
 	Layout = "~/Views/Shared/_SubLayout.cshtml";
 }
 
-<div class="container-fluid mt-5 p-0">
+<div class="container-fluid p-0">
 	<h1 class="mb-4" style="font-size: 3vw;">Welcome to Library System</h1>
 
 	<h2 class="text-primary mb-3" style="font-size: 2.5vw;">Books</h2>
-	<div class="d-flex flex-wrap justify-content-center">
+	<div class="d-flex flex-wrap justify-content-center gap-2">
 		@foreach (var book in Model.Books)
 		{
 			<div class="card-item">
@@ -43,7 +43,7 @@
 	</div>
 
 	<h2 class="text-primary mt-5 mb-3" style="font-size: 2.5vw;">Authors</h2>
-	<div class="d-flex flex-wrap justify-content-center">
+	<div class="d-flex flex-wrap justify-content-center gap-2">
 		@foreach (var author in Model.Authors)
 		{
 			<div class="card-item">
@@ -78,7 +78,6 @@
 	.d-flex {
 		display: flex;
 		flex-wrap: wrap;
-		gap: 20px; /* Spacing between items */
 	}
 
 	.card-item {
