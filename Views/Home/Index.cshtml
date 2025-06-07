@@ -28,7 +28,7 @@
 	<div class="container">
 		<h2 class="mb-5">New Books</h2>
 		<div class="row justify-content-center g-4">
-			@foreach (var book in Model.Books.Take(4))
+			@foreach (var book in Model.Books.OrderBy(b => Guid.NewGuid()).Take(4))
 			{
 				<div class="col-sm-6 col-md-4 col-lg-3" data-aos="fade-up" data-aos-delay="100">
 					<div class="card book-card border-0 shadow-sm h-100">
@@ -58,7 +58,7 @@
 	<div class="container">
 		<h2 class="mb-4 text-primary">Popular Authors</h2>
 		<div class="d-flex flex-wrap justify-content-center gap-4">
-			@foreach (var author in Model.Authors.Take(4))
+			@foreach (var author in Model.Authors.OrderBy(b => Guid.NewGuid()).Take(4))
 			{
 				<div class="card author-card shadow-sm">
 					@if (author.Image != null)

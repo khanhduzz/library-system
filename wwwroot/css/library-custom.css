@@ -289,6 +289,9 @@ body {
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     border-radius: 1rem;
     overflow: hidden;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
 }
 
     .book-card:hover {
@@ -296,11 +299,21 @@ body {
         box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
     }
 
+        .book-card:hover .book-img {
+            transform: scale(1.03);
+        }
+
 .book-img {
-    height: 250px;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 2 / 3; /* typical book ratio */
     object-fit: cover;
-    border-top-left-radius: 1rem;
-    border-top-right-radius: 1rem;
+    border-top-left-radius: 0.75rem;
+    border-top-right-radius: 0.75rem;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    border: 1px solid #ddd;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
 }
 
 .card-title {
@@ -315,9 +328,11 @@ body {
 
 @media (max-width: 576px) {
     .book-img {
-        height: 200px;
+        aspect-ratio: 2 / 3;
+        max-height: 220px;
     }
 }
+
 
 .author-card {
     width: 13rem;
